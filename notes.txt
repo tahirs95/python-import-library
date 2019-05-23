@@ -1,0 +1,16 @@
+Q - how to tell difference between sensor and subject in rep file?
+    A - all uncommented lines will refer to platforms
+Q - does everything get added to state table?
+    A - all vessel tracks yet, contacts and activations can come from pragmas
+Q - how to add entries to Entry table that appears as foreign keys in several other tables
+    A - although all uuid keys have a default function to generate a uuid, need to create one in entry table first and use that
+
+- ideas:
+  - when seeing foreign refs in file need to check if already known in memory
+  - if not known in memory search for it in DB
+  - if not in DB see if can be created for known or contextural info to create new entry
+  - if not look for data in .ini files to create new entry
+
+- poc limitations:
+  - just long/lat to indicate position
+  - hardcoded refs to other tables (for now)
