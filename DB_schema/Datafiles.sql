@@ -16,10 +16,10 @@ CREATE TABLE public."Datafiles"
         REFERENCES public."DatafileTypes" (datafiletype_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
---     CONSTRAINT datafiles_entry_fk FOREIGN KEY (datafile_id)
---         REFERENCES public."Entry" (entry_id) MATCH SIMPLE
---         ON UPDATE NO ACTION
---         ON DELETE NO ACTION,
+    CONSTRAINT datafiles_entry_fk FOREIGN KEY (datafile_id)
+        REFERENCES public."Entry" (entry_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
     CONSTRAINT datafiles_privacies_fk FOREIGN KEY (privacy_id)
         REFERENCES public."Privacies" (privacy_id) MATCH SIMPLE
         ON UPDATE NO ACTION

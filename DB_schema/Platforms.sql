@@ -11,10 +11,10 @@ CREATE TABLE public."Platforms"
     host_platform_id uuid,
     nationality_id uuid NOT NULL,
     CONSTRAINT "Platforms_pkey" PRIMARY KEY (platform_id),
---     CONSTRAINT platforms_entry_fk FOREIGN KEY (platform_id)
---         REFERENCES public."Entry" (entry_id) MATCH SIMPLE
---         ON UPDATE NO ACTION
---         ON DELETE NO ACTION,
+    CONSTRAINT platforms_entry_fk FOREIGN KEY (platform_id)
+        REFERENCES public."Entry" (entry_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
     CONSTRAINT platforms_nationalities_fk FOREIGN KEY (nationality_id)
         REFERENCES public."Nationalities" (nationality_id) MATCH SIMPLE
         ON UPDATE NO ACTION

@@ -10,10 +10,10 @@ CREATE TABLE public."Sensors"
     sensortype_id uuid NOT NULL,
     platform_id uuid NOT NULL,
     CONSTRAINT "Sensors_pkey" PRIMARY KEY (sensor_id),
---     CONSTRAINT sensor_entry_fk FOREIGN KEY (sensor_id)
---         REFERENCES public."Entry" (entry_id) MATCH SIMPLE
---         ON UPDATE NO ACTION
---         ON DELETE NO ACTION,
+    CONSTRAINT sensor_entry_fk FOREIGN KEY (sensor_id)
+        REFERENCES public."Entry" (entry_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
     CONSTRAINT sensor_platforms_fk FOREIGN KEY (platform_id)
         REFERENCES public."Platforms" (platform_id) MATCH SIMPLE
         ON UPDATE NO ACTION

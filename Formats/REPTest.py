@@ -1,4 +1,4 @@
-from REP import *
+from REPFile import *
 from Location import *
 
 # l = REPLine(1, "100112 121000 SUBJECT VC 60 23 36.32 N 000 01 48.82 E 109.08  6.00  0.00 ")
@@ -12,6 +12,6 @@ from Location import *
 #
 # print(loc)
 
-repFile = REP("../POC/Ambig_tracks2_short.rep")
+repFile = REPFile("../POC/Ambig_tracks2_short.rep")
 for repLine in repFile.getLines():
     repLine.print()

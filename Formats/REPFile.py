@@ -23,7 +23,6 @@ class REPLine:
               .format(self.lineNum, self.timestamp, self.vessel, self.symbology,
                       self.latitude, self.longitude, self.heading, self.speed, self.depth, self.textLabel))
 
-
     def parse(self):
 
         tokens = self.line.split()
@@ -126,8 +125,10 @@ class REPLine:
 
         return datetime.strptime(date + time, formatStr)
 
+    def getPlatform(self):
+        return self.vessel
 
-class REP:
+class REPFile:
 
     def __init__(self, filepath):
         self.filepath = filepath
@@ -143,7 +144,7 @@ class REP:
 
                 repL = REPLine(lineNum, line)
                 if not repL.parse():
-                    raise Exception("failed parsing file {} line {}".format(filepath, lineNum))
+                    raise Exception("failed parsing REP file {} line {}".format(filepath, lineNum))
 
                 self.lines.append(repL)
 
