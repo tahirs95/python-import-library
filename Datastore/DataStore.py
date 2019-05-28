@@ -11,6 +11,7 @@ from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION
 from geoalchemy2 import Geometry
 from sqlalchemy.orm import sessionmaker
 import psycopg2.extras
+from contextlib import contextmanager
 
 Base = declarative_base()
 
@@ -80,10 +81,10 @@ class State(Base):
     datafile_id = Column(UUID(as_uuid=True), nullable=False)
     privacy_id = Column(UUID(as_uuid=True))
 
-class Nationalities(Base):
+class Nationality(Base):
     __tablename__ = 'Nationalities'
 
-    nationality_id = Column(UUID(as_uuid=True), primary_key=True, server_default="val")
+    nationality_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     name = Column(String(150), nullable=False)
 
 
@@ -92,10 +93,10 @@ class DataStore:
     # TODO: supply or lookup user id
     def __init__(self, DBUsername, DBPassword, DBHost, DBPort, DBName):
         connectionString = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(DBUsername, DBPassword, DBHost, DBPort, DBName)
-        engine = create_engine(connectionString, echo=True)
-        Base.metadata.bind = engine
-        DBSession = sessionmaker(bind=engine)
-        self.session = DBSession()
+        self.engine = create_engine(connectionString, echo=True)
+        Base.metadata.bind = self.engine
+        #DBSession = sessionmaker(bind=self.engine)
+        #self.session = DBSession()
         #psycopg2.extras.register_uuid
 
         # caches of known data
@@ -111,6 +112,21 @@ class DataStore:
         self.defaultPrivacyId = '477f43a1-37b0-4a49-9d95-9b20729ee6b7'  # PUBLIC
         self.defaultUserId = 1  # DevUser
 
+    @contextmanager
+    def session_scope(self):
+        """Provide a transactional scope around a series of operations."""
+        DBSession = sessionmaker(bind=self.engine)
+        self.session = DBSession()
+        try:
+            yield self
+            self.session.commit()
+        except:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
+
+
     def addEntry(self, tabletypeId):
         entry_obj = Entry(
             tabletype_id=tabletypeId,
@@ -123,9 +139,9 @@ class DataStore:
 
 
     def addNationality(self, country):
-        countryObj = Nationalities(name=country)
+        countryObj = Nationality(name=country)
         self.session.add(countryObj)
-        self.session.commit()
+        self.session.flush()
 
     def addDatafileType(self, datafile_type):
         if datafile_type in self.datafileTypes:
@@ -141,7 +157,7 @@ class DataStore:
         )
 
         self.session.add(datafile_type_obj)
-        self.session.commit()
+        self.session.flush()
 
         self.datafileTypes[datafile_type] = datafile_type_obj
         # should return DB type or something else decoupled from DB?
@@ -172,7 +188,7 @@ class DataStore:
         )
 
         self.session.add(datafile_obj)
-        self.session.commit()
+        self.session.flush()
 
         self.datafiles[datafileName] = datafile_obj
         # should return DB type or something else decoupled from DB?
@@ -200,7 +216,7 @@ class DataStore:
         )
 
         self.session.add(platform_obj)
-        self.session.commit()
+        self.session.flush()
 
         self.platforms[platformName] = platform_obj
         # should return DB type or something else decoupled from DB?
@@ -227,7 +243,7 @@ class DataStore:
         )
 
         self.session.add(sensor_obj)
-        self.session.commit()
+        self.session.flush()
 
         self.sensors[sensorName] = sensor_obj
         # should return DB type or something else decoupled from DB?
@@ -248,6 +264,6 @@ class DataStore:
             privacy_id=self.defaultPrivacyId
         )
         self.session.add(state_obj)
-        self.session.commit()
+        self.session.flush()
 
         return state_obj

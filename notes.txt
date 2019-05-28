@@ -5,20 +5,22 @@ Q - does everything get added to state table?
     A - all vessel tracks yet, contacts and activations can come from pragmas
 Q - how to add entries to Entry table that appears as foreign keys in several other tables
     A - although all uuid keys have a default function to generate a uuid, need to create one in entry table first and use that
-Q - All the table names seem to be quoted, could they just be plain names?
-Q - Is it ok to use constants for the TableTypes? (could be data member of each DB class)
+Q - All the table names in postgres seem to be quoted, could they just be plain names?
+Q - Is it ok to use constants for the TableTypes? (I've just modelled them as data members of each DB class)
     Or does it need a mechanism to automatically lookup or insert table type?
-Q - Not all tables with UUIDs seem to be foreign keyed to Entry table? eg. DatafileTypes
-Q - Should I validate string lengths for DB fields against file entries?
-Q - when looking for matching Datafile, use reference for filename? or always just add every time?
-Q - Main confusion, State table just refers to sensors, not to platforms. Although lines in REP files are all platform movements, not sensor movements
+Q - Not all tables with UUIDs seem to be foreign keyed to Entry table? eg. DatafileTypes, Nationalities both have a UUID but it's not forced to belong in the Entry table
+Q - Should I validate string lengths for DB fields against file entries? eg. DB has length of 150 for some fields
+Q - when looking for matching Datafile, should I use 'reference' for filename? or always just add every time? should this be just the filename or a full path?
+Q - Main confusion: State table just refers to sensors, not to platforms. Although lines in REP files are all platform movements, not sensor movements
+    This seems to indicate that the State tables is a list of Sensor values, but I'm thinking they are position changes of a vessel/platform. Where do the vessel/platform positions get tracked?
+    Or are they just tracked in relation to the Sensor that's keeping track of it?
 
 - ideas:
   - when seeing foreign refs in file need to check if already known in memory. DONE - Datstore caches
   - if not known in memory search for it in DB. DONE - query methods when adding elements
   - if not in DB see if can be created for known or contextural info to create new entry. DONE - create new rows
   - if not look for data in .ini files to create new entry
-  - Use with: or some other mechanism to start transaction, and always commit or rollback at end without explicit calls
+  - Use with: or some other mechanism to start transaction, and always commit or rollback at end without explicit calls. DONE - use context manager session_scope
 
 - poc limitations:
   - just long/lat to indicate position
