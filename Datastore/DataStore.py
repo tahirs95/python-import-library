@@ -1,6 +1,6 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, FetchedValue
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, FetchedValue
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -26,15 +26,16 @@ class Entry(Base):
 
 class Sensor(Base):
     __tablename__ = 'Sensors'
+    tabletypeId = 2  # Only needed for tables referenced by Entry table
 
-    sensor_id = Column(UUID, primary_key=True)
+    sensor_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     name = Column(String(150), nullable=False)
     sensortype_id = Column(UUID, nullable=False)
     platform_id = Column(UUID, nullable=False)
 
 class Platform(Base):
     __tablename__ = 'Platforms'
-    tabletypeId = 1
+    tabletypeId = 1  # Only needed for tables referenced by Entry table
 
     platform_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     # TODO: does this, or other string limits need checking or validating on file import?
@@ -42,11 +43,31 @@ class Platform(Base):
     platformtype_id = Column(UUID, nullable=False)
     host_platform_id = Column(UUID)
     nationality_id = Column(UUID, nullable=False)
+    # TODO: add relationships and ForeignKey entries to auto-create Entry ids
 
+class DatafileType(Base):
+    __tablename__ = 'DatafileTypes'
+
+    datafiletype_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
+    # TODO: does this, or other string limits need checking or validating on file import?
+    name = Column(String(150), nullable=False)
+
+class Datafile(Base):
+    __tablename__ = 'Datafiles'
+    tabletypeId = 4  # Only needed for tables referenced by Entry table
+
+    datafile_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
+    # TODO: does this, or other string limits need checking or validating on file import?
+    simulated = Column(Boolean)
+    reference = Column(String(150))
+    url = Column(String(150))
+    privacy_id = Column(UUID(as_uuid=True), nullable=False)
+    datafiletype_id = Column(UUID(as_uuid=True), nullable=False)
     # TODO: add relationships and ForeignKey entries to auto-create Entry ids
 
 class State(Base):
     __tablename__ = 'State'
+    tabletypeId = 3  # Only needed for tables referenced by Entry table
 
     state_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     time = Column(TIME, nullable=False)
@@ -69,8 +90,9 @@ class Nationalities(Base):
 class DataStore:
 
     # TODO: supply or lookup user id
-    def __init__(self):
-        engine = create_engine('postgresql+psycopg2://postgres:passw0rd@localhost:5433/postgres', echo=True)
+    def __init__(self, DBUsername, DBPassword, DBHost, DBPort, DBName):
+        connectionString = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(DBUsername, DBPassword, DBHost, DBPort, DBName)
+        engine = create_engine(connectionString, echo=True)
         Base.metadata.bind = engine
         DBSession = sessionmaker(bind=engine)
         self.session = DBSession()
@@ -79,61 +101,153 @@ class DataStore:
         # caches of known data
         self.platforms = {}
         self.sensors = {}
+        self.datafiles = {}
+        self.datafileTypes = {}
 
         # TEMP list of values for defaulted IDs, to be replaced by missing info lookup mechanism
         self.defaultPlatformTypeId = '89a63755-b40d-42ad-a156-9b69cfc7b484'  # Warship
+        self.defaultSensorTypeId = '88c62daf-f808-41f0-8882-942aa41627fc'  # Sonar
         self.defaultNationalityId = 'a29033d7-3046-410a-8b80-8faf5f024f1e'  # UK
-        self.defaultUserId = '1'  # DevUser
+        self.defaultPrivacyId = '477f43a1-37b0-4a49-9d95-9b20729ee6b7'  # PUBLIC
+        self.defaultUserId = 1  # DevUser
+
+    def addEntry(self, tabletypeId):
+        entry_obj = Entry(
+            tabletype_id=tabletypeId,
+            created_user=self.defaultUserId
+        )
+        self.session.add(entry_obj)
+        self.session.flush()
+
+        return entry_obj.entry_id
+
 
     def addNationality(self, country):
         countryObj = Nationalities(name=country)
         self.session.add(countryObj)
         self.session.commit()
 
+    def addDatafileType(self, datafile_type):
+        if datafile_type in self.datafileTypes:
+            return self.datafileTypes[datafile_type]
+
+        # doesn't exist in cache, try to lookup in DB
+        datafile_type_lookup = self.session.query(DatafileType).filter(DatafileType.name == datafile_type).first()
+        if datafile_type_lookup:
+            return datafile_type_lookup
+
+        datafile_type_obj = DatafileType(
+            name=datafile_type
+        )
+
+        self.session.add(datafile_type_obj)
+        self.session.commit()
+
+        self.datafileTypes[datafile_type] = datafile_type_obj
+        # should return DB type or something else decoupled from DB?
+        return datafile_type_obj
+
+    def addDatafile(self, datafileName, datafileType):
+        if datafileName in self.datafiles:
+            return self.datafiles[datafileName]
+
+        # doesn't exist in cache, try to lookup in DB
+        datafilelookup = self.session.query(Datafile).filter(Datafile.reference == datafileName).first()
+        if datafilelookup:
+            return datafilelookup
+
+        datafile_type_obj = self.addDatafileType(datafileType)
+
+        # doesn't exist in DB, create in DB
+        # TODO: make a missing info resolver to provide missing info
+        entry_id = self.addEntry(Datafile.tabletypeId)
+
+        datafile_obj = Datafile(
+            datafile_id=entry_id,
+            simulated=False,
+            reference=datafileName,
+            url=None,
+            privacy_id=self.defaultPrivacyId,
+            datafiletype_id=datafile_type_obj.datafiletype_id
+        )
+
+        self.session.add(datafile_obj)
+        self.session.commit()
+
+        self.datafiles[datafileName] = datafile_obj
+        # should return DB type or something else decoupled from DB?
+        return datafile_obj
+
     def addPlatform(self, platformName):
         if platformName in self.platforms:
             return self.platforms[platformName]
 
         # doesn't exist in cache, try to lookup in DB
-        for platform in self.session.query(Platform).filter(Platform.name == platformName):
-            return platform
+        platformlookup = self.session.query(Platform).filter(Platform.name == platformName).first()
+        if platformlookup:
+            return platformlookup
 
         # doesn't exist in DB, create in DB
         # TODO: make a missing info resolver to provide missing info
-        # first create Entry id to use as UUID
-        entryObj = Entry(
-            tabletype_id=Platform.tabletypeId,
-            created_user=self.defaultUserId
-        )
-        self.session.add(entryObj)
-        self.session.flush()
+        entry_id = self.addEntry(Platform.tabletypeId)
 
-        platformObj = Platform(
-            platform_id=entryObj.entry_id,
+        platform_obj = Platform(
+            platform_id=entry_id,
             name=platformName,
             platformtype_id=self.defaultPlatformTypeId,
             host_platform_id=None,
             nationality_id=self.defaultNationalityId
         )
 
-        self.session.add(platformObj)
+        self.session.add(platform_obj)
         self.session.commit()
 
-        self.platforms[platformName] = platformObj
+        self.platforms[platformName] = platform_obj
         # should return DB type or something else decoupled from DB?
-        return platformObj
+        return platform_obj
 
-    def addState(self, repLine):
-        stateObj = State(
-            time=repLine.timestamp,
-            sensor_id='c1cd04fd-8b29-4ded-b146-fed4fd65167c',
-            location='('+repLine.longDegrees+','+repLine.latDegrees+')',
-            heading=repLine.heading,
+    def addSensor(self, sensorName, platform):
+        if sensorName in self.sensors:
+            return self.sensors[sensorName]
+
+        # doesn't exist in cache, try to lookup in DB
+        sensorlookup = self.session.query(Sensor).filter(Sensor.name == sensorName).first()
+        if sensorlookup:
+            return sensorlookup
+
+        # doesn't exist in DB, create in DB
+        # TODO: make a missing info resolver to provide missing info
+        entry_id = self.addEntry(Sensor.tabletypeId)
+
+        sensor_obj = Sensor(
+            sensor_id=entry_id,
+            name=sensorName,
+            sensortype_id=self.defaultSensorTypeId,
+            platform_id=str(platform.platform_id)
+        )
+
+        self.session.add(sensor_obj)
+        self.session.commit()
+
+        self.sensors[sensorName] = sensor_obj
+        # should return DB type or something else decoupled from DB?
+        return sensor_obj
+
+    def addState(self, timestamp, datafile, sensor, lat, long, heading, speed):
+        entry_id = self.addEntry(Sensor.tabletypeId)
+
+        state_obj = State(
+            time=timestamp,
+            sensor_id=sensor.sensor_id,
+            location='('+str(long.degrees)+','+str(lat.degrees)+')',
+            heading=heading,
             # TODO: how to calculate course?
             #course=,
-            speed=repLine.speed,
-            datafile_id='5aa6e5bc-94b7-48e2-bd10-940a10d11dcf',
-            privacy_id='477f43a1-37b0-4a49-9d95-9b20729ee6b7'
+            speed=speed,
+            datafile_id=datafile.datafile_id,
+            privacy_id=self.defaultPrivacyId
         )
-        self.session.add(stateObj)
+        self.session.add(state_obj)
         self.session.commit()
+
+        return state_obj

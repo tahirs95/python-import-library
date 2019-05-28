@@ -128,6 +128,7 @@ class REPLine:
     def getPlatform(self):
         return self.vessel
 
+# TODO: have base class to ensure filename and type are setup and returned
 class REPFile:
 
     def __init__(self, filepath):
@@ -150,3 +151,12 @@ class REPFile:
 
     def getLines(self):
         return self.lines
+
+    # TODO: could organise these values differently, eg. use registry of importers which also defines file type
+    # although this works well for encapsulation
+    def getDatafileType(self):
+        return "REP"
+
+    def getDatafileName(self):
+        # TODO: should this be just the filename? or the full absolute or relative path supplied?
+        return self.filepath

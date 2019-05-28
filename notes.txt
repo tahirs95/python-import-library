@@ -1,16 +1,22 @@
 Q - how to tell difference between sensor and subject in rep file?
     A - all uncommented lines will refer to platforms
+    A - sensors defined by ;SENSOR pragmas?
 Q - does everything get added to state table?
     A - all vessel tracks yet, contacts and activations can come from pragmas
 Q - how to add entries to Entry table that appears as foreign keys in several other tables
     A - although all uuid keys have a default function to generate a uuid, need to create one in entry table first and use that
 Q - All the table names seem to be quoted, could they just be plain names?
-Q - Is it ok to use constants for the TableTypes? (could be data member of each DB class) Or does it need a mechanism to automatically lookup or insert table type?
+Q - Is it ok to use constants for the TableTypes? (could be data member of each DB class)
+    Or does it need a mechanism to automatically lookup or insert table type?
+Q - Not all tables with UUIDs seem to be foreign keyed to Entry table? eg. DatafileTypes
+Q - Should I validate string lengths for DB fields against file entries?
+Q - when looking for matching Datafile, use reference for filename? or always just add every time?
+Q - Main confusion, State table just refers to sensors, not to platforms. Although lines in REP files are all platform movements, not sensor movements
 
 - ideas:
-  - when seeing foreign refs in file need to check if already known in memory
-  - if not known in memory search for it in DB
-  - if not in DB see if can be created for known or contextural info to create new entry
+  - when seeing foreign refs in file need to check if already known in memory. DONE - Datstore caches
+  - if not known in memory search for it in DB. DONE - query methods when adding elements
+  - if not in DB see if can be created for known or contextural info to create new entry. DONE - create new rows
   - if not look for data in .ini files to create new entry
   - Use with: or some other mechanism to start transaction, and always commit or rollback at end without explicit calls
 
