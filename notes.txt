@@ -25,3 +25,9 @@ Q - Main confusion: State table just refers to sensors, not to platforms. Althou
 - poc limitations:
   - just long/lat to indicate position
   - hardcoded refs to other tables (for now)
+
+- used packages
+  - SQL Alchemy 1.3
+  - geoalchemy2
+  - psycopg2
+  - nose2 (0.9.1)
