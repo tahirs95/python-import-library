@@ -91,13 +91,14 @@ class Nationality(Base):
 class DataStore:
 
     # TODO: supply or lookup user id
-    def __init__(self, DBUsername, DBPassword, DBHost, DBPort, DBName):
+    def __init__(self, DBUsername, DBPassword, DBHost, DBPort, DBName, missing_data_resolver=None):
         connectionString = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(DBUsername, DBPassword, DBHost, DBPort, DBName)
-        self.engine = create_engine(connectionString, echo=True)
+        self.engine = create_engine(connectionString, echo=False)
         Base.metadata.bind = self.engine
         #DBSession = sessionmaker(bind=self.engine)
         #self.session = DBSession()
         #psycopg2.extras.register_uuid
+        self.missing_data_resolver = missing_data_resolver
 
         # caches of known data
         self.platforms = {}
@@ -203,9 +204,12 @@ class DataStore:
         if platformlookup:
             return platformlookup
 
-        # doesn't exist in DB, create in DB
-        # TODO: make a missing info resolver to provide missing info
-        entry_id = self.addEntry(Platform.tabletypeId)
+        # doesn't exist in DB, use resolver to query for data
+        if self.missing_data_resolver:
+            entry_id = self.missing_data_resolver.resolvePlatform(platformName)
+        else:
+            # enough info to proceed and create entry
+            entry_id = self.addEntry(Platform.tabletypeId)
 
         platform_obj = Platform(
             platform_id=entry_id,

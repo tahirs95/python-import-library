@@ -1,5 +1,5 @@
 from datetime import datetime
-from Location import *
+from .Location import Location
 
 class REPLine:
 
@@ -125,8 +125,36 @@ class REPLine:
 
         return datetime.strptime(date + time, formatStr)
 
+
+    def getLineNum(self):
+        return self.lineNum
+
+    def getTimestamp(self):
+        return self.timestamp
+
     def getPlatform(self):
         return self.vessel
+
+    def getSymbology(self):
+        return self.symbology
+
+    def getLatitude(self):
+        return self.latitude
+
+    def getLongitude(self):
+        return self.longitude
+
+    def getHeading(self):
+        return self.heading
+
+    def getSpeed(self):
+        return self.speed
+
+    def getDepth(self):
+        return self.depth
+
+    def getTextLabel(self):
+        return self.textLabel
 
 # TODO: have base class to ensure filename and type are setup and returned
 class REPFile:
