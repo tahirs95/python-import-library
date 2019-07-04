@@ -3,9 +3,9 @@ from abc import ABC, abstractmethod
 class DataResolver(ABC):
 
     @abstractmethod
-    def resolvePlatform(self, platformName):
+    def resolvePlatform(self, datastore, platformName):
         pass
 
     @abstractmethod
-    def resolveSensor(self, sensorName):
+    def resolveSensor(self, datastore, sensorName):
         pass

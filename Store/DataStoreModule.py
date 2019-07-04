@@ -18,6 +18,8 @@ Base = declarative_base()
 # TODO: add foreign key refs
 # TODO: add proper uuid funcs that interact with entries table
 
+# TODO: probably move this module to the top level as it's the main one
+
 class Entry(Base):
     __tablename__ = 'Entry'
 
@@ -41,9 +43,17 @@ class Platform(Base):
     platform_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     # TODO: does this, or other string limits need checking or validating on file import?
     name = Column(String(150))
-    platformtype_id = Column(UUID, nullable=False)
-    host_platform_id = Column(UUID)
-    nationality_id = Column(UUID, nullable=False)
+    platformtype_id = Column(UUID(as_uuid=True), nullable=False)
+    host_platform_id = Column(UUID(as_uuid=True))
+    nationality_id = Column(UUID(as_uuid=True), nullable=False)
+    # TODO: add relationships and ForeignKey entries to auto-create Entry ids
+
+class PlatformType(Base):
+    __tablename__ = 'PlatformTypes'
+
+    platformtype_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
+    # TODO: does this, or other string limits need checking or validating on file import?
+    name = Column(String(150))
     # TODO: add relationships and ForeignKey entries to auto-create Entry ids
 
 class DatafileType(Base):
@@ -87,6 +97,12 @@ class Nationality(Base):
     nationality_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     name = Column(String(150), nullable=False)
 
+class Privacy(Base):
+    __tablename__ = 'Privacies'
+
+    privacy_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
+    name = Column(String(150), nullable=False)
+
 
 class DataStore:
 
@@ -110,7 +126,7 @@ class DataStore:
         self.defaultPlatformTypeId = '89a63755-b40d-42ad-a156-9b69cfc7b484'  # Warship
         self.defaultSensorTypeId = '88c62daf-f808-41f0-8882-942aa41627fc'  # Sonar
         self.defaultNationalityId = 'a29033d7-3046-410a-8b80-8faf5f024f1e'  # UK
-        self.defaultPrivacyId = '477f43a1-37b0-4a49-9d95-9b20729ee6b7'  # PUBLIC
+        self.defaultPrivacyId = '477f43a1-37b0-4a49-9d95-9b20729ee6b7'  # Public
         self.defaultUserId = 1  # DevUser
 
     @contextmanager
@@ -206,10 +222,12 @@ class DataStore:
 
         # doesn't exist in DB, use resolver to query for data
         if self.missing_data_resolver:
-            entry_id = self.missing_data_resolver.resolvePlatform(platformName)
-        else:
-            # enough info to proceed and create entry
-            entry_id = self.addEntry(Platform.tabletypeId)
+            missingPlatform = self.missing_data_resolver.resolvePlatform(self, platformName)
+            return missingPlatform
+
+        # try and proceed with defaults
+        # enough info to proceed and create entry
+        entry_id = self.addEntry(Platform.tabletypeId)
 
         platform_obj = Platform(
             platform_id=entry_id,
@@ -217,6 +235,27 @@ class DataStore:
             platformtype_id=self.defaultPlatformTypeId,
             host_platform_id=None,
             nationality_id=self.defaultNationalityId
+        )
+
+        self.session.add(platform_obj)
+        self.session.flush()
+
+        self.platforms[platformName] = platform_obj
+        # should return DB type or something else decoupled from DB?
+        return platform_obj
+
+    def createPlatform(self, platformName, chosenNationality, chosenClass, chosenClassification):
+        # don't check cache, didn't exist originally which is why we come in through this route
+
+        # create entry id to map new platform against
+        entry_id = self.addEntry(Platform.tabletypeId)
+
+        platform_obj = Platform(
+            platform_id=entry_id,
+            name=platformName,
+            platformtype_id=chosenClass.platformtype_id,
+            host_platform_id=None,
+            nationality_id=chosenNationality.nationality_id
         )
 
         self.session.add(platform_obj)
@@ -271,3 +310,19 @@ class DataStore:
         self.session.flush()
 
         return state_obj
+
+    def searchPlatform(self, platformSearchInput):
+        # search for any platform featuring this name
+        return self.session.query(Platform).filter(Platform.name.like(f"%{platformSearchInput}%")).first()
+
+    def getNationalities(self):
+        # get list of all nationalities in the DB
+        return self.session.query(Nationality).all()
+
+    def getPlatformTypes(self):
+        # get list of all platform types in the DB
+        return self.session.query(PlatformType).all()
+
+    def getClassifications(self):
+        # get list of all classifications in the DB
+        return self.session.query(Privacy).all()
