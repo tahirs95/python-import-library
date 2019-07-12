@@ -37,6 +37,7 @@ class CommandLineResolver(DataResolver):
                 sys.exit(1)
 
     def addPlatform(self, datastore, platformName):
+        ###### Chose Nationality ######
         print("Ok, adding new platform.")
         nationalityOptions = datastore.getNationalities()
         nationalityNames = [n.name for n in nationalityOptions]
@@ -49,6 +50,7 @@ class CommandLineResolver(DataResolver):
 
         chosenNationality = nationalityOptions[nationalityChoice-1]
 
+        ###### Chose Class (aka PlatformType) ######
         # TODO: confirm that "class" is referring to platform type. Assume for now that it does
         classOptions = datastore.getPlatformTypes()
         classNames = [c.name for c in classOptions]
@@ -61,6 +63,19 @@ class CommandLineResolver(DataResolver):
 
         chosenClass = classOptions[classChoice-1]
 
+        ###### Chose Sensor ######
+        sensorOptions = datastore.getSensorsByPlatformType(chosenClass)
+        sensorNames = [s.Sensor.name for s in sensorOptions]
+        sensorNames.append("Cancel import")
+        sensorChoice = CommandLineInput.getChoiceInput(f"We have {len(sensorNames)-1} other instances of {chosenClass.name} class. They contain these sensors. Please indicate which you wish to add to {platformName}: ",
+                                                       sensorNames)
+        if sensorChoice == len(sensorNames):
+            print("Quitting")
+            sys.exit(1)
+
+        chosenSensor = sensorOptions[sensorChoice-1]
+
+        ###### Chose Classification (aka Privacy) ######
         classificationOptions = datastore.getClassifications()
         classificationNames = [c.name for c in classificationOptions]
         classificationNames.append("Cancel import")
@@ -77,7 +92,7 @@ class CommandLineResolver(DataResolver):
         print(f"Name: {platformName}")
         print(f"Nationality: {chosenNationality.name}")
         print(f"Class: {chosenClass.name}")
-        print(f"Sensors: TBD")
+        print(f"Sensors: {chosenSensor.Sensor.name}")
         print(f"Classification: {chosenClassification.name}")
 
         createChoice = CommandLineInput.getChoiceInput("Create this platform?: ",
@@ -86,7 +101,7 @@ class CommandLineResolver(DataResolver):
                                                         "Cancel import"])
 
         if createChoice == 1:
-            return datastore.createPlatform(platformName, chosenNationality, chosenClass, chosenClassification)
+            return datastore.createPlatform(platformName, chosenNationality, chosenClass, chosenSensor, chosenClassification)
         elif createChoice == 2:
             return self.addPlatform(datastore, platformName)
         elif createChoice == 3:

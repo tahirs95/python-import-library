@@ -244,7 +244,7 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return platform_obj
 
-    def createPlatform(self, platformName, chosenNationality, chosenClass, chosenClassification):
+    def createPlatform(self, platformName, chosenNationality, chosenClass, chosenSensor, chosenClassification):
         # don't check cache, didn't exist originally which is why we come in through this route
 
         # create entry id to map new platform against
@@ -326,3 +326,7 @@ class DataStore:
     def getClassifications(self):
         # get list of all classifications in the DB
         return self.session.query(Privacy).all()
+
+    def getSensorsByPlatformType(self, platformType):
+        # given platform type, return all Sensors contained on platforms of that type
+        return self.session.query(Platform, Sensor).join(Sensor, Sensor.platform_id == Platform.platform_id).filter(Platform.platformtype_id == platformType.platformtype_id).all()
