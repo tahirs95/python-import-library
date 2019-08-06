@@ -1,12 +1,14 @@
+import sys
 import pathlib
 
 from Formats.REPFile import REPFile
 from Store.DataStoreModule import DataStore
 
-datastore = DataStore("postgres", "passw0rd", "localhost", 5433, "postgres")
+datastore = DataStore("", "", "", 0, "c:/temp/datastore.db", db_type='sqlite')
+#datastore = DataStore("postgres", "passw0rd", "localhost", 5433, "postgres", db_type='postgres')
 
-filePath = pathlib.Path(__file__).parent.parent / "Resources/Ambig_tracks2.rep"
-rep = REPFile(str(filePath))
+filePath = pathlib.Path(__file__).parent.parent / "Resources/missing_platform.rep"
+rep = REPFile(str(filePath.absolute()))
 
 with datastore.session_scope() as session:
     datafile = session.addDatafile(rep.getDatafileName(), rep.getDatafileType())

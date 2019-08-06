@@ -24,9 +24,24 @@ Q - Main confusion: State table just refers to sensors, not to platforms. Althou
 
 - poc limitations:
   - just long/lat to indicate position
-  - hardcoded refs to other tables (for now)
+  - hardcoded refs to other tables (for now) DONE now uses data resolvers
 
-- used packages
+- sqlite + missing data resolvers
+  - sqlite integration seems ok, but would be worried that types dont line up well or fuller integration not tested fully
+  - need to work out how to make postgres and sqlite integrations co-exist with as much common code as poss, diff DB model classes?
+  - add DefaultsResolver to use when no other resolver specified, which would set opinionated defaults, good for empty DB and means can do away with hardcoded default DB entries
+  - have added more questions to CommandLineResolver to let it populate a completely empty DB
+  - add caches for all types
+
+  + TODO before marking done
+  - method for common function pattern
+  - fork of DB classes into Sqlite and Postgres vers DONE
+  - try on a big file DONE
+  - fix parse error for platform name in quotes
+  - add relationships/foreign key defs
+  - try and UUID stuff common inside of Datastore DONE
+
+- used packages with Python 3.6.4
   - SQL Alchemy 1.3
   - geoalchemy2
   - psycopg2
