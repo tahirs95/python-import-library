@@ -3,8 +3,8 @@ from sqlalchemy.dialects.sqlite import DATETIME
 from sqlalchemy.dialects.sqlite import REAL
 import uuid
 
-from DBBase import Base
-from UUID import UUID
+from Store.DBBase import Base
+from Store.UUID import UUID
 
 def mapUUIDType(val):
     # sql does not need to map to string

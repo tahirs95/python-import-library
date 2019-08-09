@@ -5,6 +5,9 @@ from Resolvers import CommandLineInput
 
 class CommandLineResolver(DataResolver):
 
+    def __init__(self):
+        self.table_privacies = {}
+
     def synonymSearch(self, datastore, platformName):
         platformSearchInput = input("Please type word stem to search for: ")
         searchResult = datastore.searchPlatform(platformSearchInput)
@@ -78,6 +81,7 @@ class CommandLineResolver(DataResolver):
             chosenClass = classOptions[classChoice-2]
 
         ###### Chose Sensor ######
+        newSensor = False
         sensorOptions = datastore.getSensorsByPlatformType(chosenClass)
         if len(sensorOptions) > 0:
             sensorNames = [s.Sensor.name for s in sensorOptions]
@@ -90,14 +94,22 @@ class CommandLineResolver(DataResolver):
 
             chosenSensor = sensorOptions[sensorChoice-1]
         else:
-            sensorChoices = ["Add a new sensor", "Cancel import"]
-            sensorChoice = CommandLineInput.getChoiceInput(f"No instances of class {chosenClass.name} exist. Please choose an option: ",
-                                                           sensorChoices)
-            if sensorChoice == len(sensorChoices):
-                print("Quitting")
-                sys.exit(1)
-            elif sensorChoice == len(sensorChoices)-1:
-                newSensorInput = input("Please type name of new sensor: ")
+            print("No sensors found for that class. Skipping Sensor add")
+            chosenSensor = None
+            # sensorChoices = ["Add a new sensor", "Cancel import"]
+            # sensorChoice = CommandLineInput.getChoiceInput(f"No instances of class {chosenClass.name} exist. Please choose an option: ",
+            #                                                sensorChoices)
+            # if sensorChoice == len(sensorChoices):
+            #     print("Quitting")
+            #     sys.exit(1)
+            # elif sensorChoice == len(sensorChoices)-1:
+            #     sensorCheckOk = False
+            #     while not sensorCheckOk:
+            #         newSensorInput = input("Please type name of new sensor: ")
+            #         sensorCheckOk = datastore.checkSensor(newSensorInput)
+            #     #chosenSensor = datastore.addSensor(newClassInput)
+            #     chosenSensor = newSensorInput
+            #     newSensor = True
 
         ###### Chose Classification (aka Privacy) ######
         classificationOptions = datastore.getPrivacies()
@@ -116,7 +128,10 @@ class CommandLineResolver(DataResolver):
         print(f"Name: {platformName}")
         print(f"Nationality: {chosenNationality.name}")
         print(f"Class: {chosenClass.name}")
-        print(f"Sensors: {chosenSensor.Sensor.name}")
+        if chosenSensor:
+            print(f"Sensors: {chosenSensor.Sensor.name}")
+        else:
+            print("Sensors: None")
         print(f"Classification: {chosenClassification.name}")
 
         createChoice = CommandLineInput.getChoiceInput("Create this platform?: ",
@@ -143,27 +158,69 @@ class CommandLineResolver(DataResolver):
             synSearch = self.synonymSearch(datastore, platformName)
             print(f"Adding {synSearch} as a synonym for {platformName}")
         elif actionChoice == 2:
-            addedPlatform = self.addPlatform(datastore, platformName)
+            return self.addPlatform(datastore, platformName)
         elif actionChoice == 3:
             print("Quitting")
             sys.exit(1)
 
+    def addSensor(self, datastore, sensorName):
+        ###### Chose Sensor Type ######
+        print("Ok, adding new sensor.")
+        sensorTypeOptions = datastore.getSensorTypes()
+        sensorTypeNames = [st.name for st in sensorTypeOptions]
+        sensorTypeNames.append("Add a new sensor type")
+        sensorTypeNames.append("Cancel import")
+        sensorTypeChoice = CommandLineInput.getChoiceInput("Please provide sensor type: ",
+                                                           sensorTypeNames)
+        if sensorTypeChoice == len(sensorTypeNames):
+            print("Quitting")
+            sys.exit(1)
+        elif sensorTypeChoice == len(sensorTypeNames)-1:
+            sensorTypeCheckOk = False
+            while not sensorTypeCheckOk:
+                sensorTypeInput = input("Please type name of new sensor type: ")
+                sensorTypeCheckOk = datastore.checkSensorType(sensorTypeInput)
+            chosenSensorType = datastore.addSensorType(sensorTypeInput)
+        else:
+            chosenSensorType = sensorTypeOptions[sensorTypeChoice-2]
+
+        return sensorName, chosenSensorType
 
     def resolveSensor(self, datastore, sensorName):
-        pass
+        actionChoice = CommandLineInput.getChoiceInput(f"Sensor '{sensorName}' not found. Do you wish to: ",
+                                                       [f"Add a new sensor, titled '{sensorName}'",
+                                                        "Cancel import"])
 
-    def resolvePrivacy(self, datastore, tabletype):
+        if actionChoice == 1:
+            return self.addSensor(datastore, sensorName)
+        elif actionChoice == 2:
+            print("Quitting")
+            sys.exit(1)
+
+    def resolvePrivacy(self, datastore, tabletypeId, tablename):
+        if tabletypeId in self.table_privacies:
+            return tabletypeId, self.table_privacies[tabletypeId]
+
         ###### Chose Classification (aka Privacy) ######
         classificationOptions = datastore.getPrivacies()
         classificationNames = [c.name for c in classificationOptions]
+        classificationNames.append("Add a new classification")
         classificationNames.append("Cancel import")
-        classificationChoice = CommandLineInput.getChoiceInput(f"Ok, please provide classification for table {tabletype}: ",
+        classificationChoice = CommandLineInput.getChoiceInput(f"Ok, please provide classification for table '{tablename}': ",
                                                                classificationNames)
 
         if classificationChoice == len(classificationNames):
             print("Quitting")
             sys.exit(1)
+        elif classificationChoice == len(classificationNames)-1:
+            classificationCheckOk = False
+            while not classificationCheckOk:
+                newClassificationInput = input("Please type name of new classification: ")
+                classificationCheckOk = datastore.checkPrivacy(newClassificationInput)
+            chosenClassification = datastore.addPrivacy(newClassificationInput)
+        else:
+            chosenClassification = classificationOptions[classificationChoice-2]
 
-        chosenClassification = classificationOptions[classificationChoice-1]
+        self.table_privacies[tabletypeId] = chosenClassification
 
-        return tabletype, chosenClassification
+        return tabletypeId, chosenClassification

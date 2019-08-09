@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from importlib import import_module
 from contextlib import contextmanager
 
-from DBBase import Base
+from Store.DBBase import Base
 from Resolvers.DefaultsResolver import DefaultsResolver
 
 # TODO: add foreign key refs
@@ -18,10 +18,10 @@ class DataStore:
     # Valid options for db_type are 'postgres' and 'sqlite'
     def __init__(self, db_username, db_password, db_host, db_port, db_name, db_type='postgres', missing_data_resolver=DefaultsResolver()):
         if db_type == 'postgres':
-            self.DBClasses = import_module('PostgresDB')
+            self.DBClasses = import_module('Store.PostgresDB')
             driver = 'postgresql+psycopg2'
         elif db_type == 'sqlite':
-            self.DBClasses = import_module('SqliteDB')
+            self.DBClasses = import_module('Store.SqliteDB')
             driver = 'sqlite+pysqlite'
         else:
             raise Exception(f"Unknown db_type {db_type} supplied, if specified should be one of 'postgres' or 'sqlite'")
@@ -215,7 +215,7 @@ class DataStore:
         datafile_type_obj = self.addDatafileType(datafileType)
 
         # don't know privacy, use resolver to query for data
-        missingPrivacyData = self.missing_data_resolver.resolvePrivacy(self, self.DBClasses.Datafile.tabletypeId)
+        missingPrivacyData = self.missing_data_resolver.resolvePrivacy(self, self.DBClasses.Datafile.tabletypeId, self.DBClasses.Datafile.__tablename__)
 
         # missingPrivacyData should contain (tabletype, privacyName)
         # enough info to proceed and create entry
@@ -335,7 +335,7 @@ class DataStore:
         # No cache for entries, just add new one when called
 
         # don't know privacy, use resolver to query for data
-        missingPrivacyData = self.missing_data_resolver.resolvePrivacy(self, self.DBClasses.State.tabletypeId)
+        missingPrivacyData = self.missing_data_resolver.resolvePrivacy(self, self.DBClasses.State.tabletypeId, self.DBClasses.State.__tablename__)
 
         # missingPrivacyData should contain (tabletype, privacyName)
         # enough info to proceed and create entry
@@ -415,9 +415,17 @@ class DataStore:
         # get list of all privacies in the DB
         return self.session.query(self.DBClasses.Privacy).all()
 
+    def getSensors(self):
+        # get list of all sensors in the DB
+        return self.session.query(self.DBClasses.Sensor).all()
+
+    def getSensorTypes(self):
+        # get list of all sensors types in the DB
+        return self.session.query(self.DBClasses.SensorType).all()
+
     def getSensorsByPlatformType(self, platformType):
         # given platform type, return all Sensors contained on platforms of that type
-        return self.session.query(self.DBClasses.Platform, self.DBClasses.Sensor).join(self.DBClasses.Sensor, self.DBClasses.Sensor.platform_id == self.DBClasses.Platform.platform_id).filter(Platform.platformtype_id == platformType.platformtype_id).all()
+        return self.session.query(self.DBClasses.Platform, self.DBClasses.Sensor).join(self.DBClasses.Sensor, self.DBClasses.Sensor.platform_id == self.DBClasses.Platform.platform_id).filter(self.DBClasses.Platform.platformtype_id == platformType.platformtype_id).all()
 
 
     #############################################################
@@ -434,6 +442,17 @@ class DataStore:
 
         return True
 
+    # return True if provided privacy ok
+    def checkPrivacy(self, privacy):
+        if len(privacy) == 0:
+            return False
+
+        if next((priv for priv in self.getPrivacies() if priv.name == privacy), None):
+            # A privacy already exists with that name
+            return False
+
+        return True
+
     # return True if provided platform type ok
     def checkPlatformType(self, platformType):
         if len(platformType) == 0:
@@ -441,6 +460,28 @@ class DataStore:
 
         if next((pt for pt in self.getPlatformTypes() if pt.name == platformType), None):
             # A platform type already exists with that name
+            return False
+
+        return True
+
+    # return True if provided sensor ok
+    def checkSensor(self, sensor):
+        if len(sensor) == 0:
+            return False
+
+        if next((sen for sen in self.getSensors() if sen.name == sensor), None):
+            # A sensor already exists with that name
+            return False
+
+        return True
+
+    # return True if provided sensor type ok
+    def checkSensorType(self, sensorType):
+        if len(sensorType) == 0:
+            return False
+
+        if next((st for st in self.getSensorTypes() if st.name == sensorType), None):
+            # A sensor type already exists with that name
             return False
 
         return True

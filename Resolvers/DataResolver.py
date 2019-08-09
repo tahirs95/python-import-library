@@ -15,7 +15,7 @@ class DataResolver(ABC):
         pass
 
     @abstractmethod
-    def resolvePrivacy(self, datastore, tabletype):
+    def resolvePrivacy(self, datastore, tabletypeId, tablename):
         # Implementation method should return any data necessary to create a privacy
-        # Currently: tabletype, privacyName
+        # Currently: tabletypeId, privacyName
         pass

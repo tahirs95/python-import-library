@@ -46,3 +46,7 @@ Q - Main confusion: State table just refers to sensors, not to platforms. Althou
   - geoalchemy2
   - psycopg2
   - nose2 (0.9.1)
+
+- run from command line with module flag and no file extension eg:
+  py -m Experiments.DataStore_resolverExperiment
+- make sure all module imports done relative to top level qualified with package name eg: Store.DBBase

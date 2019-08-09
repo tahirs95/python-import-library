@@ -32,12 +32,12 @@ class DefaultsResolver(DataResolver):
 
         return sensorName, sensorType
 
-    def resolvePrivacy(self, datastore, tabletype):
+    def resolvePrivacy(self, datastore, tabletypeId, tablename):
         # needs to establish defaults for privacy
 
         privacy = datastore.searchPrivacy(self.defaultPrivacy)
         if not privacy:
             privacy = datastore.addPrivacy(self.defaultPrivacy)
 
-        return tabletype, privacy
+        return tabletypeId, privacy
 

@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.dialects.postgresql import TIME
 from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION
 
-from DBBase import Base
+from Store.DBBase import Base
 
 def mapUUIDType(val):
     # postgres needs to map to string
