@@ -15,7 +15,8 @@ To install packages use `pip install <package>` or `py -3 -m pip install <packag
 
 To run from the command line go to the top level directory of the library in your bash shell or terminal program
 
-Run by specifying the program as a module with `-m`  
+Run by specifying the program as a module with `-m` and leaving off the .py file extension
+
 The exact executable name for invoking python will depend how you have it installed, but most commonly it's just `python`
   
 For example run the Sqlite example using:  
