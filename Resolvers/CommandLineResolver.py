@@ -150,16 +150,15 @@ class CommandLineResolver(DataResolver):
 
     def resolvePlatform(self, datastore, platformName):
         actionChoice = CommandLineInput.getChoiceInput(f"Platform '{platformName}' not found. Do you wish to: ",
-                                                       ["Search for synonym of this name",
+                                                       [#"Search for synonym of this name",
                                                         f"Add a new platform, titled '{platformName}'",
                                                         "Cancel import"])
 
         if actionChoice == 1:
-            synSearch = self.synonymSearch(datastore, platformName)
-            print(f"Adding {synSearch} as a synonym for {platformName}")
-        elif actionChoice == 2:
+            #synSearch = self.synonymSearch(datastore, platformName)
+            #print(f"Adding {synSearch} as a synonym for {platformName}")
             return self.addPlatform(datastore, platformName)
-        elif actionChoice == 3:
+        else:
             print("Quitting")
             sys.exit(1)
 

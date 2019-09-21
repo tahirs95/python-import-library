@@ -19,7 +19,7 @@ SET row_security = off;
 -- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA public;
+--CREATE SCHEMA public;
 
 
 ALTER SCHEMA public OWNER TO postgres;
@@ -29,6 +29,9 @@ ALTER SCHEMA public OWNER TO postgres;
 --
 
 COMMENT ON SCHEMA public IS 'standard public schema';
+
+--GRANT USAGE ON SCHEMA public TO postgres;
+--CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
@@ -120,7 +123,7 @@ CREATE FUNCTION public.log_state_changes() RETURNS trigger
     AS $$
 BEGIN
  IF NEW.time <> OLD.time THEN
- INSERT INTO "ChangeLog"(tabletype_id, entry_id, "column", old_value, new_value, changed_date)
+ INSERT INTO changelog(tabletype_id, entry_id, "column", old_value, new_value, changed_date)
  VALUES(1, old.state_id, "time", OLD.time, new.time, Now());
  END IF;
  RETURN NEW;
@@ -135,10 +138,10 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: Activations; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: activations; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Activations" (
+CREATE TABLE public.activations (
     sensor_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     "end" timestamp without time zone NOT NULL,
     min_range double precision,
@@ -153,13 +156,13 @@ CREATE TABLE public."Activations" (
 );
 
 
-ALTER TABLE public."Activations" OWNER TO tracstor_admin;
+ALTER TABLE public.activations OWNER TO tracstor_admin;
 
 --
--- Name: ChangeLog; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: changelog; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."ChangeLog" (
+CREATE TABLE public.changelog (
     changelog_id integer NOT NULL,
     tabletype_id integer,
     entry_id uuid,
@@ -171,13 +174,13 @@ CREATE TABLE public."ChangeLog" (
 );
 
 
-ALTER TABLE public."ChangeLog" OWNER TO tracstor_admin;
+ALTER TABLE public.changelog OWNER TO tracstor_admin;
 
 --
--- Name: Contacts; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: contacts; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Contacts" (
+CREATE TABLE public.contacts (
     contact_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL,
     sensor_id uuid NOT NULL,
@@ -193,25 +196,25 @@ CREATE TABLE public."Contacts" (
 );
 
 
-ALTER TABLE public."Contacts" OWNER TO tracstor_admin;
+ALTER TABLE public.contacts OWNER TO tracstor_admin;
 
 --
--- Name: DatafileTypes; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: datafiletypes; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."DatafileTypes" (
+CREATE TABLE public.datafiletypes (
     datafiletype_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL
 );
 
 
-ALTER TABLE public."DatafileTypes" OWNER TO tracstor_admin;
+ALTER TABLE public.datafiletypes OWNER TO tracstor_admin;
 
 --
--- Name: Datafiles; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: datafiles; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Datafiles" (
+CREATE TABLE public.datafiles (
     datafile_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     simulated boolean,
     reference character varying(150),
@@ -221,26 +224,26 @@ CREATE TABLE public."Datafiles" (
 );
 
 
-ALTER TABLE public."Datafiles" OWNER TO tracstor_admin;
+ALTER TABLE public.datafiles OWNER TO tracstor_admin;
 
 --
--- Name: Entry; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: entry; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Entry" (
+CREATE TABLE public.entry (
     entry_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     tabletype_id integer NOT NULL,
     created_user integer
 );
 
 
-ALTER TABLE public."Entry" OWNER TO tracstor_admin;
+ALTER TABLE public.entry OWNER TO tracstor_admin;
 
 --
--- Name: EntryTags; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: entrytags; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."EntryTags" (
+CREATE TABLE public.entrytags (
     entry_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     tag_id integer NOT NULL,
     created_user integer,
@@ -248,25 +251,25 @@ CREATE TABLE public."EntryTags" (
 );
 
 
-ALTER TABLE public."EntryTags" OWNER TO tracstor_admin;
+ALTER TABLE public.entrytags OWNER TO tracstor_admin;
 
 --
--- Name: EntryTypes; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: entrytypes; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."EntryTypes" (
+CREATE TABLE public.entrytypes (
     entrytype_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL
 );
 
 
-ALTER TABLE public."EntryTypes" OWNER TO tracstor_admin;
+ALTER TABLE public.entrytypes OWNER TO tracstor_admin;
 
 --
--- Name: Geometries; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: geometries; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Geometries" (
+CREATE TABLE public.geometries (
     geometry_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL,
     geometrytype_id uuid NOT NULL,
@@ -281,38 +284,38 @@ CREATE TABLE public."Geometries" (
 );
 
 
-ALTER TABLE public."Geometries" OWNER TO tracstor_admin;
+ALTER TABLE public.geometries OWNER TO tracstor_admin;
 
 --
--- Name: GeometrySubTypes; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: geometrysubtypes; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."GeometrySubTypes" (
+CREATE TABLE public.geometrysubtypes (
     geometrysubtype_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL,
     geometrytype_id uuid NOT NULL
 );
 
 
-ALTER TABLE public."GeometrySubTypes" OWNER TO tracstor_admin;
+ALTER TABLE public.geometrysubtypes OWNER TO tracstor_admin;
 
 --
--- Name: GeometryTypes; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: geometrytypes; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."GeometryTypes" (
+CREATE TABLE public.geometrytypes (
     geometrytype_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL
 );
 
 
-ALTER TABLE public."GeometryTypes" OWNER TO tracstor_admin;
+ALTER TABLE public.geometrytypes OWNER TO tracstor_admin;
 
 --
--- Name: Media; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: media; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Media" (
+CREATE TABLE public.media (
     media_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     source_platform_id uuid,
     subject_platform_id uuid,
@@ -326,25 +329,25 @@ CREATE TABLE public."Media" (
 );
 
 
-ALTER TABLE public."Media" OWNER TO tracstor_admin;
+ALTER TABLE public.media OWNER TO tracstor_admin;
 
 --
--- Name: MediaTypes; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: mediatypes; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."MediaTypes" (
+CREATE TABLE public.mediatypes (
     mediatype_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL
 );
 
 
-ALTER TABLE public."MediaTypes" OWNER TO tracstor_admin;
+ALTER TABLE public.mediatypes OWNER TO tracstor_admin;
 
 --
--- Name: NarrativeEntries; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: narrativeentries; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."NarrativeEntries" (
+CREATE TABLE public.narrativeentries (
     narrativeentry_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     platform_id uuid,
     "time" timestamp without time zone NOT NULL,
@@ -355,25 +358,25 @@ CREATE TABLE public."NarrativeEntries" (
 );
 
 
-ALTER TABLE public."NarrativeEntries" OWNER TO tracstor_admin;
+ALTER TABLE public.narrativeentries OWNER TO tracstor_admin;
 
 --
--- Name: Nationalities; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: nationalities; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Nationalities" (
+CREATE TABLE public.nationalities (
     nationality_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL
 );
 
 
-ALTER TABLE public."Nationalities" OWNER TO tracstor_admin;
+ALTER TABLE public.nationalities OWNER TO tracstor_admin;
 
 --
--- Name: Participation; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: participation; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Participation" (
+CREATE TABLE public.participation (
     participation_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     platform_id uuid NOT NULL,
     task_id uuid NOT NULL,
@@ -383,25 +386,25 @@ CREATE TABLE public."Participation" (
 );
 
 
-ALTER TABLE public."Participation" OWNER TO tracstor_admin;
+ALTER TABLE public.participation OWNER TO tracstor_admin;
 
 --
--- Name: PlatformTypes; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: platformtypes; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."PlatformTypes" (
+CREATE TABLE public.platformtypes (
     platformtype_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL
 );
 
 
-ALTER TABLE public."PlatformTypes" OWNER TO tracstor_admin;
+ALTER TABLE public.platformtypes OWNER TO tracstor_admin;
 
 --
--- Name: Platforms; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: platforms; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Platforms" (
+CREATE TABLE public.platforms (
     platform_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL,
     platformtype_id uuid NOT NULL,
@@ -410,37 +413,37 @@ CREATE TABLE public."Platforms" (
 );
 
 
-ALTER TABLE public."Platforms" OWNER TO tracstor_admin;
+ALTER TABLE public.platforms OWNER TO tracstor_admin;
 
 --
--- Name: Privacies; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: privacies; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Privacies" (
+CREATE TABLE public.privacies (
     privacy_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL
 );
 
 
-ALTER TABLE public."Privacies" OWNER TO tracstor_admin;
+ALTER TABLE public.privacies OWNER TO tracstor_admin;
 
 --
--- Name: SensorTypes; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: sensortypes; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."SensorTypes" (
+CREATE TABLE public.sensortypes (
     sensortype_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL
 );
 
 
-ALTER TABLE public."SensorTypes" OWNER TO tracstor_admin;
+ALTER TABLE public.sensortypes OWNER TO tracstor_admin;
 
 --
--- Name: Sensors; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: sensors; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Sensors" (
+CREATE TABLE public.sensors (
     sensor_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name character varying(150) NOT NULL,
     sensortype_id uuid NOT NULL,
@@ -448,13 +451,13 @@ CREATE TABLE public."Sensors" (
 );
 
 
-ALTER TABLE public."Sensors" OWNER TO tracstor_admin;
+ALTER TABLE public.sensors OWNER TO tracstor_admin;
 
 --
--- Name: State; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: state; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."State" (
+CREATE TABLE public.state (
     state_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     "time" timestamp without time zone NOT NULL,
     sensor_id uuid NOT NULL,
@@ -467,38 +470,38 @@ CREATE TABLE public."State" (
 );
 
 
-ALTER TABLE public."State" OWNER TO tracstor_admin;
+ALTER TABLE public.state OWNER TO tracstor_admin;
 
 --
--- Name: TableTypes; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: tabletypes; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."TableTypes" (
+CREATE TABLE public.tabletypes (
     tabletype_id integer NOT NULL,
     name character varying(150) NOT NULL
 );
 
 
-ALTER TABLE public."TableTypes" OWNER TO tracstor_admin;
+ALTER TABLE public.tabletypes OWNER TO tracstor_admin;
 
 --
--- Name: Tags; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: tags; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Tags" (
+CREATE TABLE public.tags (
     tag_id integer NOT NULL,
     tag_text character varying(500) NOT NULL,
     created_user integer NOT NULL
 );
 
 
-ALTER TABLE public."Tags" OWNER TO tracstor_admin;
+ALTER TABLE public.tags OWNER TO tracstor_admin;
 
 --
--- Name: Tasks; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: tasks; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Tasks" (
+CREATE TABLE public.tasks (
     task_id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     parenttask_id uuid,
     start timestamp without time zone NOT NULL,
@@ -508,25 +511,25 @@ CREATE TABLE public."Tasks" (
 );
 
 
-ALTER TABLE public."Tasks" OWNER TO tracstor_admin;
+ALTER TABLE public.tasks OWNER TO tracstor_admin;
 
 --
--- Name: Users; Type: TABLE; Schema: public; Owner: tracstor_admin
+-- Name: users; Type: TABLE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE TABLE public."Users" (
+CREATE TABLE public.users (
     user_id integer NOT NULL,
     user_name character varying(150) NOT NULL
 );
 
 
-ALTER TABLE public."Users" OWNER TO tracstor_admin;
+ALTER TABLE public.users OWNER TO tracstor_admin;
 
 --
--- Name: Users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: tracstor_admin
+-- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: tracstor_admin
 --
 
-CREATE SEQUENCE public."Users_user_id_seq"
+CREATE SEQUENCE public.users_user_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -535,13 +538,13 @@ CREATE SEQUENCE public."Users_user_id_seq"
     CACHE 1;
 
 
-ALTER TABLE public."Users_user_id_seq" OWNER TO tracstor_admin;
+ALTER TABLE public.users_user_id_seq OWNER TO tracstor_admin;
 
 --
--- Name: Users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: tracstor_admin
+-- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: tracstor_admin
 --
 
-ALTER SEQUENCE public."Users_user_id_seq" OWNED BY public."Users".user_id;
+ALTER SEQUENCE public.users_user_id_seq OWNED BY public.users.user_id;
 
 
 --
@@ -557,634 +560,634 @@ CREATE TABLE public.test (
 ALTER TABLE public.test OWNER TO tracstor_admin;
 
 --
--- Name: Users user_id; Type: DEFAULT; Schema: public; Owner: tracstor_admin
+-- Name: users user_id; Type: DEFAULT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Users" ALTER COLUMN user_id SET DEFAULT nextval('public."Users_user_id_seq"'::regclass);
+ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.users_user_id_seq'::regclass);
 
 
 --
--- Name: Activations Activations_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: activations activations_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Activations"
-    ADD CONSTRAINT "Activations_pkey" PRIMARY KEY (activation_id);
+ALTER TABLE ONLY public.activations
+    ADD CONSTRAINT activations_pkey PRIMARY KEY (activation_id);
 
 
 --
--- Name: ChangeLog ChangeLog_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: changelog changelog_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."ChangeLog"
-    ADD CONSTRAINT "ChangeLog_pkey" PRIMARY KEY (changelog_id);
+ALTER TABLE ONLY public.changelog
+    ADD CONSTRAINT changelog_pkey PRIMARY KEY (changelog_id);
 
 
 --
--- Name: Contacts Contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: contacts contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Contacts"
-    ADD CONSTRAINT "Contacts_pkey" PRIMARY KEY (contact_id);
+ALTER TABLE ONLY public.contacts
+    ADD CONSTRAINT contacts_pkey PRIMARY KEY (contact_id);
 
 
 --
--- Name: DatafileTypes DatafileTypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: datafiletypes datafiletypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."DatafileTypes"
-    ADD CONSTRAINT "DatafileTypes_pkey" PRIMARY KEY (datafiletype_id);
+ALTER TABLE ONLY public.datafiletypes
+    ADD CONSTRAINT datafiletypes_pkey PRIMARY KEY (datafiletype_id);
 
 
 --
--- Name: Datafiles Datafiles_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: datafiles datafiles_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Datafiles"
-    ADD CONSTRAINT "Datafiles_pkey" PRIMARY KEY (datafile_id);
+ALTER TABLE ONLY public.datafiles
+    ADD CONSTRAINT datafiles_pkey PRIMARY KEY (datafile_id);
 
 
 --
--- Name: EntryTypes EntryTypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: entrytypes entrytypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."EntryTypes"
-    ADD CONSTRAINT "EntryTypes_pkey" PRIMARY KEY (entrytype_id);
+ALTER TABLE ONLY public.entrytypes
+    ADD CONSTRAINT entrytypes_pkey PRIMARY KEY (entrytype_id);
 
 
 --
--- Name: Entry Entry_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: entry entry_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Entry"
-    ADD CONSTRAINT "Entry_pkey" PRIMARY KEY (entry_id);
+ALTER TABLE ONLY public.entry
+    ADD CONSTRAINT entry_pkey PRIMARY KEY (entry_id);
 
 
 --
--- Name: Geometries Geometries_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometries geometries_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Geometries"
-    ADD CONSTRAINT "Geometries_pkey" PRIMARY KEY (geometry_id);
+ALTER TABLE ONLY public.geometries
+    ADD CONSTRAINT geometries_pkey PRIMARY KEY (geometry_id);
 
 
 --
--- Name: GeometrySubTypes GeometrySubTypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometrysubtypes geometrysubtypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."GeometrySubTypes"
-    ADD CONSTRAINT "GeometrySubTypes_pkey" PRIMARY KEY (geometrysubtype_id);
+ALTER TABLE ONLY public.geometrysubtypes
+    ADD CONSTRAINT geometrysubtypes_pkey PRIMARY KEY (geometrysubtype_id);
 
 
 --
--- Name: GeometryTypes GeometryTypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometrytypes geometrytypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."GeometryTypes"
-    ADD CONSTRAINT "GeometryTypes_pkey" PRIMARY KEY (geometrytype_id);
+ALTER TABLE ONLY public.geometrytypes
+    ADD CONSTRAINT geometrytypes_pkey PRIMARY KEY (geometrytype_id);
 
 
 --
--- Name: MediaTypes MediaTypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: mediatypes mediatypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."MediaTypes"
-    ADD CONSTRAINT "MediaTypes_pkey" PRIMARY KEY (mediatype_id);
+ALTER TABLE ONLY public.mediatypes
+    ADD CONSTRAINT mediatypes_pkey PRIMARY KEY (mediatype_id);
 
 
 --
--- Name: Media Media_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: media media_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Media"
-    ADD CONSTRAINT "Media_pkey" PRIMARY KEY (media_id);
+ALTER TABLE ONLY public.media
+    ADD CONSTRAINT media_pkey PRIMARY KEY (media_id);
 
 
 --
--- Name: NarrativeEntries NarrativeEntries_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: narrativeentries narrativeentries_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."NarrativeEntries"
-    ADD CONSTRAINT "NarrativeEntries_pkey" PRIMARY KEY (narrativeentry_id);
+ALTER TABLE ONLY public.narrativeentries
+    ADD CONSTRAINT narrativeentries_pkey PRIMARY KEY (narrativeentry_id);
 
 
 --
--- Name: Nationalities Nationalities_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: nationalities nationalities_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Nationalities"
-    ADD CONSTRAINT "Nationalities_pkey" PRIMARY KEY (nationality_id);
+ALTER TABLE ONLY public.nationalities
+    ADD CONSTRAINT nationalities_pkey PRIMARY KEY (nationality_id);
 
 
 --
--- Name: Participation Participation_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: participation participation_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Participation"
-    ADD CONSTRAINT "Participation_pkey" PRIMARY KEY (participation_id);
+ALTER TABLE ONLY public.participation
+    ADD CONSTRAINT participation_pkey PRIMARY KEY (participation_id);
 
 
 --
--- Name: PlatformTypes PlatformTypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: platformtypes platformtypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."PlatformTypes"
-    ADD CONSTRAINT "PlatformTypes_pkey" PRIMARY KEY (platformtype_id);
+ALTER TABLE ONLY public.platformtypes
+    ADD CONSTRAINT platformtypes_pkey PRIMARY KEY (platformtype_id);
 
 
 --
--- Name: Platforms Platforms_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: platforms platforms_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Platforms"
-    ADD CONSTRAINT "Platforms_pkey" PRIMARY KEY (platform_id);
+ALTER TABLE ONLY public.platforms
+    ADD CONSTRAINT platforms_pkey PRIMARY KEY (platform_id);
 
 
 --
--- Name: Privacies Privacies_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: privacies privacies_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Privacies"
-    ADD CONSTRAINT "Privacies_pkey" PRIMARY KEY (privacy_id);
+ALTER TABLE ONLY public.privacies
+    ADD CONSTRAINT privacies_pkey PRIMARY KEY (privacy_id);
 
 
 --
--- Name: SensorTypes SensorTypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: sensortypes sensortypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."SensorTypes"
-    ADD CONSTRAINT "SensorTypes_pkey" PRIMARY KEY (sensortype_id);
+ALTER TABLE ONLY public.sensortypes
+    ADD CONSTRAINT sensortypes_pkey PRIMARY KEY (sensortype_id);
 
 
 --
--- Name: Sensors Sensors_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: sensors sensors_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Sensors"
-    ADD CONSTRAINT "Sensors_pkey" PRIMARY KEY (sensor_id);
+ALTER TABLE ONLY public.sensors
+    ADD CONSTRAINT sensors_pkey PRIMARY KEY (sensor_id);
 
 
 --
--- Name: State State_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: state state_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."State"
-    ADD CONSTRAINT "State_pkey" PRIMARY KEY (state_id);
+ALTER TABLE ONLY public.state
+    ADD CONSTRAINT state_pkey PRIMARY KEY (state_id);
 
 
 --
--- Name: TableTypes TableTypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: tabletypes tabletypes_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."TableTypes"
-    ADD CONSTRAINT "TableTypes_pkey" PRIMARY KEY (tabletype_id);
+ALTER TABLE ONLY public.tabletypes
+    ADD CONSTRAINT tabletypes_pkey PRIMARY KEY (tabletype_id);
 
 
 --
--- Name: Tags Tags_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Tags"
-    ADD CONSTRAINT "Tags_pkey" PRIMARY KEY (tag_id);
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_pkey PRIMARY KEY (tag_id);
 
 
 --
--- Name: Tasks Tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: tasks tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Tasks"
-    ADD CONSTRAINT "Tasks_pkey" PRIMARY KEY (task_id);
+ALTER TABLE ONLY public.tasks
+    ADD CONSTRAINT tasks_pkey PRIMARY KEY (task_id);
 
 
 --
--- Name: Users Users_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Users"
-    ADD CONSTRAINT "Users_pkey" PRIMARY KEY (user_id);
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
 
 
 --
--- Name: Activations activations_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: activations activations_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Activations"
-    ADD CONSTRAINT activations_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public."Datafiles"(datafile_id);
+ALTER TABLE ONLY public.activations
+    ADD CONSTRAINT activations_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public.datafiles(datafile_id);
 
 
 --
--- Name: Activations activations_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: activations activations_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Activations"
-    ADD CONSTRAINT activations_entry_fk FOREIGN KEY (activation_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.activations
+    ADD CONSTRAINT activations_entry_fk FOREIGN KEY (activation_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: Activations activations_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: activations activations_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Activations"
-    ADD CONSTRAINT activations_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public."Privacies"(privacy_id);
+ALTER TABLE ONLY public.activations
+    ADD CONSTRAINT activations_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public.privacies(privacy_id);
 
 
 --
--- Name: Activations activations_sensors_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: activations activations_sensors_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Activations"
-    ADD CONSTRAINT activations_sensors_fk FOREIGN KEY (sensor_id) REFERENCES public."Sensors"(sensor_id);
+ALTER TABLE ONLY public.activations
+    ADD CONSTRAINT activations_sensors_fk FOREIGN KEY (sensor_id) REFERENCES public.sensors(sensor_id);
 
 
 --
--- Name: Contacts contacts_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: contacts contacts_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Contacts"
-    ADD CONSTRAINT contacts_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public."Datafiles"(datafile_id);
+ALTER TABLE ONLY public.contacts
+    ADD CONSTRAINT contacts_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public.datafiles(datafile_id);
 
 
 --
--- Name: Contacts contacts_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: contacts contacts_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Contacts"
-    ADD CONSTRAINT contacts_entry_fk FOREIGN KEY (contact_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.contacts
+    ADD CONSTRAINT contacts_entry_fk FOREIGN KEY (contact_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: Contacts contacts_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: contacts contacts_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Contacts"
-    ADD CONSTRAINT contacts_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public."Privacies"(privacy_id);
+ALTER TABLE ONLY public.contacts
+    ADD CONSTRAINT contacts_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public.privacies(privacy_id);
 
 
 --
--- Name: Contacts contacts_sensors_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: contacts contacts_sensors_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Contacts"
-    ADD CONSTRAINT contacts_sensors_fk FOREIGN KEY (sensor_id) REFERENCES public."Sensors"(sensor_id);
+ALTER TABLE ONLY public.contacts
+    ADD CONSTRAINT contacts_sensors_fk FOREIGN KEY (sensor_id) REFERENCES public.sensors(sensor_id);
 
 
 --
--- Name: Datafiles datafiles_datafiletypes_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: datafiles datafiles_datafiletypes_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Datafiles"
-    ADD CONSTRAINT datafiles_datafiletypes_fk FOREIGN KEY (datafiletype_id) REFERENCES public."DatafileTypes"(datafiletype_id);
+ALTER TABLE ONLY public.datafiles
+    ADD CONSTRAINT datafiles_datafiletypes_fk FOREIGN KEY (datafiletype_id) REFERENCES public.datafiletypes(datafiletype_id);
 
 
 --
--- Name: Datafiles datafiles_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: datafiles datafiles_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Datafiles"
-    ADD CONSTRAINT datafiles_entry_fk FOREIGN KEY (datafile_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.datafiles
+    ADD CONSTRAINT datafiles_entry_fk FOREIGN KEY (datafile_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: Datafiles datafiles_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: datafiles datafiles_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Datafiles"
-    ADD CONSTRAINT datafiles_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public."Privacies"(privacy_id);
+ALTER TABLE ONLY public.datafiles
+    ADD CONSTRAINT datafiles_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public.privacies(privacy_id);
 
 
 --
--- Name: Entry entry_tabletypes_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: entry entry_tabletypes_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Entry"
-    ADD CONSTRAINT entry_tabletypes_fk FOREIGN KEY (tabletype_id) REFERENCES public."TableTypes"(tabletype_id);
+ALTER TABLE ONLY public.entry
+    ADD CONSTRAINT entry_tabletypes_fk FOREIGN KEY (tabletype_id) REFERENCES public.tabletypes(tabletype_id);
 
 
 --
--- Name: Entry entry_users_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: entry entry_users_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Entry"
-    ADD CONSTRAINT entry_users_fk FOREIGN KEY (created_user) REFERENCES public."Users"(user_id);
+ALTER TABLE ONLY public.entry
+    ADD CONSTRAINT entry_users_fk FOREIGN KEY (created_user) REFERENCES public.users(user_id);
 
 
 --
--- Name: EntryTags entrytags_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: entrytags entrytags_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."EntryTags"
-    ADD CONSTRAINT entrytags_entry_fk FOREIGN KEY (entry_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.entrytags
+    ADD CONSTRAINT entrytags_entry_fk FOREIGN KEY (entry_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: EntryTags entrytags_tags_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: entrytags entrytags_tags_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."EntryTags"
-    ADD CONSTRAINT entrytags_tags_fk FOREIGN KEY (tag_id) REFERENCES public."Tags"(tag_id);
+ALTER TABLE ONLY public.entrytags
+    ADD CONSTRAINT entrytags_tags_fk FOREIGN KEY (tag_id) REFERENCES public.tags(tag_id);
 
 
 --
--- Name: EntryTags entrytags_users_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: entrytags entrytags_users_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."EntryTags"
-    ADD CONSTRAINT entrytags_users_fk FOREIGN KEY (created_user) REFERENCES public."Users"(user_id);
+ALTER TABLE ONLY public.entrytags
+    ADD CONSTRAINT entrytags_users_fk FOREIGN KEY (created_user) REFERENCES public.users(user_id);
 
 
 --
--- Name: Geometries geometries_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometries geometries_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Geometries"
-    ADD CONSTRAINT geometries_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public."Datafiles"(datafile_id);
+ALTER TABLE ONLY public.geometries
+    ADD CONSTRAINT geometries_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public.datafiles(datafile_id);
 
 
 --
--- Name: Geometries geometries_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometries geometries_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Geometries"
-    ADD CONSTRAINT geometries_entry_fk FOREIGN KEY (geometry_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.geometries
+    ADD CONSTRAINT geometries_entry_fk FOREIGN KEY (geometry_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: Geometries geometries_geometrysubtype_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometries geometries_geometrysubtype_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Geometries"
-    ADD CONSTRAINT geometries_geometrysubtype_fk FOREIGN KEY (geometrysubtype_id) REFERENCES public."GeometrySubTypes"(geometrysubtype_id);
+ALTER TABLE ONLY public.geometries
+    ADD CONSTRAINT geometries_geometrysubtype_fk FOREIGN KEY (geometrysubtype_id) REFERENCES public.geometrysubtypes(geometrysubtype_id);
 
 
 --
--- Name: Geometries geometries_geometrytype_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometries geometries_geometrytype_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Geometries"
-    ADD CONSTRAINT geometries_geometrytype_fk FOREIGN KEY (geometrytype_id) REFERENCES public."GeometryTypes"(geometrytype_id);
+ALTER TABLE ONLY public.geometries
+    ADD CONSTRAINT geometries_geometrytype_fk FOREIGN KEY (geometrytype_id) REFERENCES public.geometrytypes(geometrytype_id);
 
 
 --
--- Name: Geometries geometries_platform_sensors_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometries geometries_platform_sensors_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Geometries"
-    ADD CONSTRAINT geometries_platform_sensors_fk FOREIGN KEY (sensor_platform_id) REFERENCES public."Platforms"(platform_id);
+ALTER TABLE ONLY public.geometries
+    ADD CONSTRAINT geometries_platform_sensors_fk FOREIGN KEY (sensor_platform_id) REFERENCES public.platforms(platform_id);
 
 
 --
--- Name: Geometries geometries_platform_subject_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometries geometries_platform_subject_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Geometries"
-    ADD CONSTRAINT geometries_platform_subject_fk FOREIGN KEY (subject_platform_id) REFERENCES public."Platforms"(platform_id);
+ALTER TABLE ONLY public.geometries
+    ADD CONSTRAINT geometries_platform_subject_fk FOREIGN KEY (subject_platform_id) REFERENCES public.platforms(platform_id);
 
 
 --
--- Name: Geometries geometries_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometries geometries_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Geometries"
-    ADD CONSTRAINT geometries_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public."Privacies"(privacy_id);
+ALTER TABLE ONLY public.geometries
+    ADD CONSTRAINT geometries_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public.privacies(privacy_id);
 
 
 --
--- Name: Geometries geometries_task_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometries geometries_task_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Geometries"
-    ADD CONSTRAINT geometries_task_fk FOREIGN KEY (task_id) REFERENCES public."Tasks"(task_id);
+ALTER TABLE ONLY public.geometries
+    ADD CONSTRAINT geometries_task_fk FOREIGN KEY (task_id) REFERENCES public.tasks(task_id);
 
 
 --
--- Name: GeometrySubTypes geometrysubtypes_geometrytype_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: geometrysubtypes geometrysubtypes_geometrytype_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."GeometrySubTypes"
-    ADD CONSTRAINT geometrysubtypes_geometrytype_fk FOREIGN KEY (geometrytype_id) REFERENCES public."GeometryTypes"(geometrytype_id);
+ALTER TABLE ONLY public.geometrysubtypes
+    ADD CONSTRAINT geometrysubtypes_geometrytype_fk FOREIGN KEY (geometrytype_id) REFERENCES public.geometrytypes(geometrytype_id);
 
 
 --
--- Name: Media media_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: media media_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Media"
-    ADD CONSTRAINT media_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public."Datafiles"(datafile_id);
+ALTER TABLE ONLY public.media
+    ADD CONSTRAINT media_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public.datafiles(datafile_id);
 
 
 --
--- Name: Media media_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: media media_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Media"
-    ADD CONSTRAINT media_entry_fk FOREIGN KEY (media_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.media
+    ADD CONSTRAINT media_entry_fk FOREIGN KEY (media_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: Media media_mediatype_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: media media_mediatype_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Media"
-    ADD CONSTRAINT media_mediatype_fk FOREIGN KEY (mediatype_id) REFERENCES public."MediaTypes"(mediatype_id);
+ALTER TABLE ONLY public.media
+    ADD CONSTRAINT media_mediatype_fk FOREIGN KEY (mediatype_id) REFERENCES public.mediatypes(mediatype_id);
 
 
 --
--- Name: Media media_platform_source_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: media media_platform_source_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Media"
-    ADD CONSTRAINT media_platform_source_fk FOREIGN KEY (source_platform_id) REFERENCES public."Platforms"(platform_id);
+ALTER TABLE ONLY public.media
+    ADD CONSTRAINT media_platform_source_fk FOREIGN KEY (source_platform_id) REFERENCES public.platforms(platform_id);
 
 
 --
--- Name: Media media_platform_subject_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: media media_platform_subject_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Media"
-    ADD CONSTRAINT media_platform_subject_fk FOREIGN KEY (subject_platform_id) REFERENCES public."Platforms"(platform_id);
+ALTER TABLE ONLY public.media
+    ADD CONSTRAINT media_platform_subject_fk FOREIGN KEY (subject_platform_id) REFERENCES public.platforms(platform_id);
 
 
 --
--- Name: Media media_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: media media_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Media"
-    ADD CONSTRAINT media_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public."Privacies"(privacy_id);
+ALTER TABLE ONLY public.media
+    ADD CONSTRAINT media_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public.privacies(privacy_id);
 
 
 --
--- Name: Media media_sensor_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: media media_sensor_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Media"
-    ADD CONSTRAINT media_sensor_fk FOREIGN KEY (sensor_id) REFERENCES public."Sensors"(sensor_id);
+ALTER TABLE ONLY public.media
+    ADD CONSTRAINT media_sensor_fk FOREIGN KEY (sensor_id) REFERENCES public.sensors(sensor_id);
 
 
 --
--- Name: NarrativeEntries narrativeentries_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: narrativeentries narrativeentries_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."NarrativeEntries"
-    ADD CONSTRAINT narrativeentries_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public."Datafiles"(datafile_id);
+ALTER TABLE ONLY public.narrativeentries
+    ADD CONSTRAINT narrativeentries_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public.datafiles(datafile_id);
 
 
 --
--- Name: NarrativeEntries narrativeentries_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: narrativeentries narrativeentries_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."NarrativeEntries"
-    ADD CONSTRAINT narrativeentries_entry_fk FOREIGN KEY (narrativeentry_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.narrativeentries
+    ADD CONSTRAINT narrativeentries_entry_fk FOREIGN KEY (narrativeentry_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: NarrativeEntries narrativeentries_entrytypes_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: narrativeentries narrativeentries_entrytypes_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."NarrativeEntries"
-    ADD CONSTRAINT narrativeentries_entrytypes_fk FOREIGN KEY (entrytype_id) REFERENCES public."EntryTypes"(entrytype_id);
+ALTER TABLE ONLY public.narrativeentries
+    ADD CONSTRAINT narrativeentries_entrytypes_fk FOREIGN KEY (entrytype_id) REFERENCES public.entrytypes(entrytype_id);
 
 
 --
--- Name: NarrativeEntries narrativeentries_platform_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: narrativeentries narrativeentries_platform_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."NarrativeEntries"
-    ADD CONSTRAINT narrativeentries_platform_fk FOREIGN KEY (platform_id) REFERENCES public."Platforms"(platform_id);
+ALTER TABLE ONLY public.narrativeentries
+    ADD CONSTRAINT narrativeentries_platform_fk FOREIGN KEY (platform_id) REFERENCES public.platforms(platform_id);
 
 
 --
--- Name: NarrativeEntries narrativeentries_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: narrativeentries narrativeentries_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."NarrativeEntries"
-    ADD CONSTRAINT narrativeentries_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public."Privacies"(privacy_id);
+ALTER TABLE ONLY public.narrativeentries
+    ADD CONSTRAINT narrativeentries_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public.privacies(privacy_id);
 
 
 --
--- Name: Participation participation_platform_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: participation participation_platform_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Participation"
-    ADD CONSTRAINT participation_platform_fk FOREIGN KEY (platform_id) REFERENCES public."Platforms"(platform_id);
+ALTER TABLE ONLY public.participation
+    ADD CONSTRAINT participation_platform_fk FOREIGN KEY (platform_id) REFERENCES public.platforms(platform_id);
 
 
 --
--- Name: Participation participation_tasks_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: participation participation_tasks_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Participation"
-    ADD CONSTRAINT participation_tasks_fk FOREIGN KEY (task_id) REFERENCES public."Tasks"(task_id);
+ALTER TABLE ONLY public.participation
+    ADD CONSTRAINT participation_tasks_fk FOREIGN KEY (task_id) REFERENCES public.tasks(task_id);
 
 
 --
--- Name: Platforms platforms_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: platforms platforms_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Platforms"
-    ADD CONSTRAINT platforms_entry_fk FOREIGN KEY (platform_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.platforms
+    ADD CONSTRAINT platforms_entry_fk FOREIGN KEY (platform_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: Platforms platforms_nationalities_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: platforms platforms_nationalities_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Platforms"
-    ADD CONSTRAINT platforms_nationalities_fk FOREIGN KEY (nationality_id) REFERENCES public."Nationalities"(nationality_id);
+ALTER TABLE ONLY public.platforms
+    ADD CONSTRAINT platforms_nationalities_fk FOREIGN KEY (nationality_id) REFERENCES public.nationalities(nationality_id);
 
 
 --
--- Name: Platforms platforms_platforms_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: platforms platforms_platforms_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Platforms"
-    ADD CONSTRAINT platforms_platforms_fk FOREIGN KEY (host_platform_id) REFERENCES public."Platforms"(platform_id);
+ALTER TABLE ONLY public.platforms
+    ADD CONSTRAINT platforms_platforms_fk FOREIGN KEY (host_platform_id) REFERENCES public.platforms(platform_id);
 
 
 --
--- Name: Platforms platforms_platformtypes_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: platforms platforms_platformtypes_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Platforms"
-    ADD CONSTRAINT platforms_platformtypes_fk FOREIGN KEY (platformtype_id) REFERENCES public."PlatformTypes"(platformtype_id);
+ALTER TABLE ONLY public.platforms
+    ADD CONSTRAINT platforms_platformtypes_fk FOREIGN KEY (platformtype_id) REFERENCES public.platformtypes(platformtype_id);
 
 
 --
--- Name: Sensors sensor_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: sensors sensor_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Sensors"
-    ADD CONSTRAINT sensor_entry_fk FOREIGN KEY (sensor_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.sensors
+    ADD CONSTRAINT sensor_entry_fk FOREIGN KEY (sensor_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: Sensors sensor_platforms_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: sensors sensor_platforms_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Sensors"
-    ADD CONSTRAINT sensor_platforms_fk FOREIGN KEY (platform_id) REFERENCES public."Platforms"(platform_id);
+ALTER TABLE ONLY public.sensors
+    ADD CONSTRAINT sensor_platforms_fk FOREIGN KEY (platform_id) REFERENCES public.platforms(platform_id);
 
 
 --
--- Name: Sensors sensor_sensortypes_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: sensors sensor_sensortypes_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Sensors"
-    ADD CONSTRAINT sensor_sensortypes_fk FOREIGN KEY (sensortype_id) REFERENCES public."SensorTypes"(sensortype_id);
+ALTER TABLE ONLY public.sensors
+    ADD CONSTRAINT sensor_sensortypes_fk FOREIGN KEY (sensortype_id) REFERENCES public.sensortypes(sensortype_id);
 
 
 --
--- Name: State state_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: state state_datafiles_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."State"
-    ADD CONSTRAINT state_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public."Datafiles"(datafile_id);
+ALTER TABLE ONLY public.state
+    ADD CONSTRAINT state_datafiles_fk FOREIGN KEY (datafile_id) REFERENCES public.datafiles(datafile_id);
 
 
 --
--- Name: State state_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: state state_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."State"
-    ADD CONSTRAINT state_entry_fk FOREIGN KEY (state_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.state
+    ADD CONSTRAINT state_entry_fk FOREIGN KEY (state_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: State state_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: state state_privacies_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."State"
-    ADD CONSTRAINT state_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public."Privacies"(privacy_id);
+ALTER TABLE ONLY public.state
+    ADD CONSTRAINT state_privacies_fk FOREIGN KEY (privacy_id) REFERENCES public.privacies(privacy_id);
 
 
 --
--- Name: State state_sensors_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: state state_sensors_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."State"
-    ADD CONSTRAINT state_sensors_fk FOREIGN KEY (sensor_id) REFERENCES public."Sensors"(sensor_id);
+ALTER TABLE ONLY public.state
+    ADD CONSTRAINT state_sensors_fk FOREIGN KEY (sensor_id) REFERENCES public.sensors(sensor_id);
 
 
 --
--- Name: Tags tags_users_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: tags tags_users_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Tags"
-    ADD CONSTRAINT tags_users_fk FOREIGN KEY (created_user) REFERENCES public."Users"(user_id);
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_users_fk FOREIGN KEY (created_user) REFERENCES public.users(user_id);
 
 
 --
--- Name: Tasks tasks_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: tasks tasks_entry_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Tasks"
-    ADD CONSTRAINT tasks_entry_fk FOREIGN KEY (task_id) REFERENCES public."Entry"(entry_id);
+ALTER TABLE ONLY public.tasks
+    ADD CONSTRAINT tasks_entry_fk FOREIGN KEY (task_id) REFERENCES public.entry(entry_id);
 
 
 --
--- Name: Tasks tasks_tasks_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
+-- Name: tasks tasks_tasks_fk; Type: FK CONSTRAINT; Schema: public; Owner: tracstor_admin
 --
 
-ALTER TABLE ONLY public."Tasks"
-    ADD CONSTRAINT tasks_tasks_fk FOREIGN KEY (parenttask_id) REFERENCES public."Tasks"(task_id);
+ALTER TABLE ONLY public.tasks
+    ADD CONSTRAINT tasks_tasks_fk FOREIGN KEY (parenttask_id) REFERENCES public.tasks(task_id);
 
 
 --
@@ -1216,192 +1219,192 @@ GRANT ALL ON FUNCTION public.log_state_changes() TO tracstor_dev;
 
 
 --
--- Name: TABLE "Activations"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE activations; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."Activations" TO tracstor_dev;
-
-
---
--- Name: TABLE "ChangeLog"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."ChangeLog" TO tracstor_dev;
+GRANT ALL ON TABLE public.activations TO tracstor_dev;
 
 
 --
--- Name: TABLE "Contacts"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE changelog; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."Contacts" TO tracstor_dev;
-
-
---
--- Name: TABLE "DatafileTypes"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."DatafileTypes" TO tracstor_dev;
+GRANT ALL ON TABLE public.changelog TO tracstor_dev;
 
 
 --
--- Name: TABLE "Datafiles"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE contacts; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."Datafiles" TO tracstor_dev;
-
-
---
--- Name: TABLE "Entry"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."Entry" TO tracstor_dev;
+GRANT ALL ON TABLE public.contacts TO tracstor_dev;
 
 
 --
--- Name: TABLE "EntryTags"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE datafiletypes; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."EntryTags" TO tracstor_dev;
-
-
---
--- Name: TABLE "EntryTypes"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."EntryTypes" TO tracstor_dev;
+GRANT ALL ON TABLE public.datafiletypes TO tracstor_dev;
 
 
 --
--- Name: TABLE "Geometries"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE datafiles; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."Geometries" TO tracstor_dev;
-
-
---
--- Name: TABLE "GeometrySubTypes"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."GeometrySubTypes" TO tracstor_dev;
+GRANT ALL ON TABLE public.datafiles TO tracstor_dev;
 
 
 --
--- Name: TABLE "GeometryTypes"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE entry; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."GeometryTypes" TO tracstor_dev;
-
-
---
--- Name: TABLE "Media"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."Media" TO tracstor_dev;
+GRANT ALL ON TABLE public.entry TO tracstor_dev;
 
 
 --
--- Name: TABLE "MediaTypes"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE entrytags; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."MediaTypes" TO tracstor_dev;
-
-
---
--- Name: TABLE "NarrativeEntries"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."NarrativeEntries" TO tracstor_dev;
+GRANT ALL ON TABLE public.entrytags TO tracstor_dev;
 
 
 --
--- Name: TABLE "Nationalities"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE entrytypes; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."Nationalities" TO tracstor_dev;
-
-
---
--- Name: TABLE "Participation"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."Participation" TO tracstor_dev;
+GRANT ALL ON TABLE public.entrytypes TO tracstor_dev;
 
 
 --
--- Name: TABLE "PlatformTypes"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE geometries; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."PlatformTypes" TO tracstor_dev;
-
-
---
--- Name: TABLE "Platforms"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."Platforms" TO tracstor_dev;
+GRANT ALL ON TABLE public.geometries TO tracstor_dev;
 
 
 --
--- Name: TABLE "Privacies"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE geometrysubtypes; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."Privacies" TO tracstor_dev;
-
-
---
--- Name: TABLE "SensorTypes"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."SensorTypes" TO tracstor_dev;
+GRANT ALL ON TABLE public.geometrysubtypes TO tracstor_dev;
 
 
 --
--- Name: TABLE "Sensors"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE geometrytypes; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."Sensors" TO tracstor_dev;
-
-
---
--- Name: TABLE "State"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."State" TO tracstor_dev;
+GRANT ALL ON TABLE public.geometrytypes TO tracstor_dev;
 
 
 --
--- Name: TABLE "TableTypes"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE media; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."TableTypes" TO tracstor_dev;
-
-
---
--- Name: TABLE "Tags"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."Tags" TO tracstor_dev;
+GRANT ALL ON TABLE public.media TO tracstor_dev;
 
 
 --
--- Name: TABLE "Tasks"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE mediatypes; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON TABLE public."Tasks" TO tracstor_dev;
-
-
---
--- Name: TABLE "Users"; Type: ACL; Schema: public; Owner: tracstor_admin
---
-
-GRANT ALL ON TABLE public."Users" TO tracstor_dev;
+GRANT ALL ON TABLE public.mediatypes TO tracstor_dev;
 
 
 --
--- Name: SEQUENCE "Users_user_id_seq"; Type: ACL; Schema: public; Owner: tracstor_admin
+-- Name: TABLE narrativeentries; Type: ACL; Schema: public; Owner: tracstor_admin
 --
 
-GRANT ALL ON SEQUENCE public."Users_user_id_seq" TO tracstor_dev;
+GRANT ALL ON TABLE public.narrativeentries TO tracstor_dev;
+
+
+--
+-- Name: TABLE nationalities; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.nationalities TO tracstor_dev;
+
+
+--
+-- Name: TABLE participation; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.participation TO tracstor_dev;
+
+
+--
+-- Name: TABLE platformtypes; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.platformtypes TO tracstor_dev;
+
+
+--
+-- Name: TABLE platforms; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.platforms TO tracstor_dev;
+
+
+--
+-- Name: TABLE privacies; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.privacies TO tracstor_dev;
+
+
+--
+-- Name: TABLE sensortypes; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.sensortypes TO tracstor_dev;
+
+
+--
+-- Name: TABLE sensors; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.sensors TO tracstor_dev;
+
+
+--
+-- Name: TABLE state; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.state TO tracstor_dev;
+
+
+--
+-- Name: TABLE tabletypes; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.tabletypes TO tracstor_dev;
+
+
+--
+-- Name: TABLE tags; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.tags TO tracstor_dev;
+
+
+--
+-- Name: TABLE tasks; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.tasks TO tracstor_dev;
+
+
+--
+-- Name: TABLE users; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON TABLE public.users TO tracstor_dev;
+
+
+--
+-- Name: SEQUENCE users_user_id_seq; Type: ACL; Schema: public; Owner: tracstor_admin
+--
+
+GRANT ALL ON SEQUENCE public.users_user_id_seq TO tracstor_dev;
 
 
 --
