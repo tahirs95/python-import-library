@@ -1,6 +1,7 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import OperationalError
 from importlib import import_module
 from contextlib import contextmanager
 
@@ -47,8 +48,12 @@ class DataStore:
         self.defaultUserId = 1  # DevUser
 
         if db_type == 'sqlite':
-            # Attempt to create schema if not present, to cope with fresh DB file
-            Base.metadata.create_all(self.engine)
+            try:
+                # Attempt to create schema if not present, to cope with fresh DB file
+                Base.metadata.create_all(self.engine)
+            except OperationalError:
+                print("Error creating database schema, possible invalid path? ('" + db_name + "'). Quitting")
+                exit()
 
     @contextmanager
     def session_scope(self):

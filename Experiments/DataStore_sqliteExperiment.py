@@ -5,7 +5,7 @@ from Formats.REPFile import REPFile
 from Store.DataStoreModule import DataStore
 from Resolvers.CommandLineResolver import CommandLineResolver
 
-datastore = DataStore("", "", "", 0, "c:/temp/datastore.db", db_type='sqlite', missing_data_resolver=CommandLineResolver())
+datastore = DataStore("", "", "", 0, "sqlite_datastore.db", db_type='sqlite', missing_data_resolver=CommandLineResolver())
 #datastore = DataStore("postgres", "passw0rd", "localhost", 5433, "postgres", db_type='postgres')
 
 filePath = pathlib.Path(__file__).parent.parent / "Resources/missing_platform.rep"
