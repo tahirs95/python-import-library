@@ -114,6 +114,7 @@ class CommandLineResolver(DataResolver):
         ###### Chose Classification (aka Privacy) ######
         classificationOptions = datastore.getPrivacies()
         classificationNames = [c.name for c in classificationOptions]
+        classificationNames.append("Add a new classification")
         classificationNames.append("Cancel import")
         classificationChoice = CommandLineInput.getChoiceInput("Ok, please provide classification for this platform: ",
                                                                classificationNames)
@@ -121,8 +122,14 @@ class CommandLineResolver(DataResolver):
         if classificationChoice == len(classificationNames):
             print("Quitting")
             sys.exit(1)
-
-        chosenClassification = classificationOptions[classificationChoice-1]
+        elif classificationChoice == len(classificationNames)-1:
+            classificationCheckOk = False
+            while not classificationCheckOk:
+                newClassificationInput = input("Please type name of new classification: ")
+                classificationCheckOk = datastore.checkPrivacy(newClassificationInput)
+            chosenClassification = datastore.addPrivacy(newClassificationInput)
+        else:
+            chosenClassification = classificationOptions[classificationChoice-2]
 
         print("Input complete. About to create this platform:")
         print(f"Name: {platformName}")
