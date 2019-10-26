@@ -28,3 +28,7 @@ To run from inside IntelliJ open the project
 Mark the `Store` package as source by right clicking on the directory and selecting `Mark Directory as -> Source Root`
 
 Open any python module you want to run in the main editor window, right click anywhere in the editor and choose the `Run` or `Debug` option
+
+# Jupyter demo
+Placeholder for live Jupyter 
+[![Master branch](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/debrief/python-import-library/master)
