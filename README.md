@@ -30,5 +30,9 @@ Mark the `Store` package as source by right clicking on the directory and select
 Open any python module you want to run in the main editor window, right click anywhere in the editor and choose the `Run` or `Debug` option
 
 # Jupyter demo
-Placeholder for live Jupyter 
+
+Link to HelloWorld demo script: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/debrief/python-import-library/master?filepath=jupyter%2FHelloWorld.ipynb)
+
+
+Placeholder for live Jupyter view of whole repo
 [![Master branch](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/debrief/python-import-library/master)
