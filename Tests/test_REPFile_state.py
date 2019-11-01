@@ -47,6 +47,12 @@ class BasicTests(unittest.TestCase):
         repfile = REPFile(TEST_FILE)
         self.assertEqual(8, len(repfile.getLines()))
 
+    def test_FileTypes(self):
+        repfile = REPFile(TEST_FILE)
+        self.assertEqual("REP", repfile.getDatafileType())
+        self.assertEqual(TEST_FILE, repfile.getDatafileName())
+
+
     def test_fileParseError(self):
         excep_thrown = False
         try:

@@ -26,6 +26,12 @@ class REPLine:
     def parse(self):
 
         tokens = self.line.split()
+
+        # just check we have enough tokens to work with        
+        if len(tokens) < 15:
+            print("Error on line {} not enough tokens: {}".format(self.lineNum, self.line))
+            return False
+
         # separate token strings
         dateToken = tokens[0]
         timeToken = tokens[1]
@@ -47,10 +53,6 @@ class REPLine:
             # TODO: join back into single string, or extract full substring
             self.textLabelToken = tokens[15:]
 
-        if len(tokens) < 15:
-            print("Error on line {} not enough tokens: {}".format(self.lineNum, self.line))
-            return False
-
 
         if len(dateToken) != 6 and len(dateToken) != 8:
             print("Line {}. Error in Date format {}. Should be either 2 of 4 figure date, followed by month then date".format(self.lineNum, dateToken))
@@ -70,6 +72,9 @@ class REPLine:
             if len(symVals[0]) != 2 and len(symVals[0]) != 5:
                 print("Line {}. Error in Symbology format {}. Should be 2 or 5 chars".format(self.lineNum, symbologyToken))
                 return False
+
+        #FixMe - I don't think we can reach this line,
+        # due to the logic in the previous test
         if len(symVals) != 1 and len(symVals) != 2:
             print("Line {}. Error in Symbology format {}".format(self.lineNum, symbologyToken))
             return False
@@ -82,7 +87,7 @@ class REPLine:
             return False
 
         self.longitude = Location(longDegreesToken, longMinsToken, longSecsToken, longHemiToken)
-        if not self.latitude.parse():
+        if not self.longitude.parse():
             print("Line {}. Error in longitude parsing".format(self.lineNum))
             return False
 
