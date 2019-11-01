@@ -1,14 +1,14 @@
 import os, sys
 import unittest
+import datetime
 
 from Formats.REPFile import REPFile, REPLine
+from Formats.Location import Location
 
 path = os.path.abspath(__file__)
 dir_path = os.path.dirname(path)
 TEST_FILE = os.path.join(dir_path, "reptest1.rep")
 ERROR_TEST_FILE = os.path.join(dir_path, "reptest2.rep")
-
-
 
 class BasicTests(unittest.TestCase):
 
@@ -65,15 +65,18 @@ class BasicTests(unittest.TestCase):
         repline.parse()
 
         self.assertEqual(1, repline.getLineNum())
-        self.assertEqual("SUBJECT", repline.getTimestamp())
+
+        print(repline.getTimestamp())
+
+        self.assertEqual(datetime.datetime(2010, 1, 12, 12, 8), repline.getTimestamp())
         self.assertEqual("SUBJECT", repline.getPlatform())
-        self.assertEqual("SUBJECT", repline.getSymbology())
-        self.assertEqual("SUBJECT", repline.getLatitude())
-        self.assertEqual("SUBJECT", repline.getLongitude())
-        self.assertEqual("SUBJECT", repline.getHeading())
-        self.assertEqual("SUBJECT", repline.getSpeed())
-        self.assertEqual("SUBJECT", repline.getDepth())
-        self.assertEqual("SUBJECT", repline.getTextLabel())
+        self.assertEqual("VC", repline.getSymbology())
+     #FixMe   self.assertEqual(Location(60.0, 23.0, 40.25, "N"), repline.getLatitude())
+     #FixMe   self.assertEqual("SUBJECT", repline.getLongitude())
+        self.assertEqual(109.08, repline.getHeading())
+        self.assertEqual(6.0, repline.getSpeed())
+        self.assertEqual(0.0, repline.getDepth())
+        self.assertEqual(None, repline.getTextLabel())
 
 if __name__ == "__main__":
     unittest.main()
