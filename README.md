@@ -9,7 +9,16 @@ For Postgres support and unit tests these packages are also required:
 * psycopg2
 * nose2 (0.9.1)
 
-To install packages use `pip install <package>` or `py -3 -m pip install <package>` depending on your installation
+### Dependencies
+
+Install the python dependencies with: `pip install -r requirements.txt`
+
+Was: _To install packages use `pip install <package>` or `py -3 -m pip install <package>` depending on your installation_
+
+### Unit tests
+
+* Run the unit test suite with:  `coverage3 run -m unittest discover -v`
+* View the unit test coverage with: `coverage report`
 
 # Command Line Instructions
 
