@@ -6,12 +6,14 @@ from importlib import import_module
 from contextlib import contextmanager
 
 from Store.DBBase import Base
+from Store.DBStatus import TableTypes
 from Resolvers.DefaultsResolver import DefaultsResolver
 
 # TODO: add foreign key refs
 # TODO: add proper uuid funcs that interact with entries table
 
 # TODO: probably move this module to the top level as it's the main one
+
 
 class DataStore:
 
@@ -26,6 +28,9 @@ class DataStore:
             driver = 'sqlite+pysqlite'
         else:
             raise Exception(f"Unknown db_type {db_type} supplied, if specified should be one of 'postgres' or 'sqlite'")
+
+        # setup table type data
+        self.setupTabletypeMap()
 
         connectionString = '{}://{}:{}@{}:{}/{}'.format(driver, db_username, db_password, db_host, db_port, db_name)
         self.engine = create_engine(connectionString, echo=False)
@@ -490,3 +495,22 @@ class DataStore:
             return False
 
         return True
+
+
+    #############################################################
+    # Generic Metadata functions
+
+    def setupTabletypeMap(self):
+        # setup a map of tables keyed by TableType
+        dbclasses = dict([(name, cls) for name, cls in self.DBClasses.__dict__.items() if isinstance(cls, type)
+                          and issubclass(cls, Base) and cls.__name__ != 'Base'])
+        self.metaClasses = {}
+        for tabletype in TableTypes:
+            self.metaClasses[tabletype] = [cls for name, cls in dbclasses.items() if dbclasses[name].tabletype == tabletype]
+
+    def getTabletypeData(self, tabletypes):
+        retmap = {}
+        for tabletype in tabletypes:
+            for table in self.metaClasses[tabletype]:
+                retmap[table.__name__] = self.session.query(table).count()
+        return retmap
