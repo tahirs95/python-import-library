@@ -514,3 +514,9 @@ class DataStore:
             for table in self.metaClasses[tabletype]:
                 retmap[table.__name__] = self.session.query(table).count()
         return retmap
+
+    def populateReference(self):
+        pass
+
+    def populateData(self):
+        pass
