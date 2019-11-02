@@ -1,7 +1,8 @@
 import os, sys
 import unittest
 
-from Formats.REPFile import REPFile, REPLine
+from Formats.REPFile import REPFile
+from Formats.State import State
 
 path = os.path.abspath(__file__)
 dir_path = os.path.dirname(path)
@@ -61,19 +62,38 @@ class BasicTests(unittest.TestCase):
     ####################
 
     def test_lineOk(self):
-        repline = REPLine(1, "100112 120800 SUBJECT VC 60 23 40.25 N 000 01 25.86 E 109.08  6.00  0.00 ")
-        repline.parse()
+        state = State(1, "100112 120800 SUBJECT VC 60 23 40.25 N 000 01 25.86 E 109.08  6.00  0.00 ")
+        state.parse()
 
-        self.assertEqual(1, repline.getLineNum())
-        self.assertEqual("SUBJECT", repline.getTimestamp())
-        self.assertEqual("SUBJECT", repline.getPlatform())
-        self.assertEqual("SUBJECT", repline.getSymbology())
-        self.assertEqual("SUBJECT", repline.getLatitude())
-        self.assertEqual("SUBJECT", repline.getLongitude())
-        self.assertEqual("SUBJECT", repline.getHeading())
-        self.assertEqual("SUBJECT", repline.getSpeed())
-        self.assertEqual("SUBJECT", repline.getDepth())
-        self.assertEqual("SUBJECT", repline.getTextLabel())
+        self.assertEqual(1, state.getLineNum())
+        self.assertEqual("SUBJECT", state.getTimestamp())
+        self.assertEqual("SUBJECT", state.getPlatform())
+        self.assertEqual("SUBJECT", state.getSymbology())
+        self.assertEqual("SUBJECT", state.getLatitude())
+        self.assertEqual("SUBJECT", state.getLongitude())
+        self.assertEqual("SUBJECT", state.getHeading())
+        self.assertEqual("SUBJECT", state.getSpeed())
+        self.assertEqual("SUBJECT", state.getDepth())
+        self.assertEqual("SUBJECT", state.getTextLabel())
+
+
+    def test_stateConversion(self):
+        state = State(1, "100112 120800 SUBJECT VC 60 23 40.25 N 000 01 25.86 E 109.08  6.00  0.00 ")
+        state.parse()
+
+        # Speed and Heading from state
+        # heading -> 109.08 (degrees)
+        # speed   -> 6.00 (knots)
+
+        # state.parse will call the appropriate setters for speed and headings
+        # Asserting converted values from getters
+
+        self.assertEqual(1.9038051480754146, state.getHeading())
+        self.assertEqual(3.086666666666667, state.getSpeed())
+        
+
+
+
 
 if __name__ == "__main__":
     unittest.main()

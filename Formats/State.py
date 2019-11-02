@@ -140,7 +140,7 @@ class State:
         return datetime.strptime(date + time, formatStr)
 
     def setSpeed(self, speed):
-        pass
+        self.speed = speed
 
     def setHeading(self, heading):   
         self.heading = heading
