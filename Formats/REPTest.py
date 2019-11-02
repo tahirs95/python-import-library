@@ -4,7 +4,7 @@ from Formats.REPFile import REPFile
 from Formats.Location import Location
 import pathlib
 
-# l = REPLine(1, "100112 121000 SUBJECT VC 60 23 36.32 N 000 01 48.82 E 109.08  6.00  0.00 ")
+# l = State(1, "100112 121000 SUBJECT VC 60 23 36.32 N 000 01 48.82 E 109.08  6.00  0.00 ")
 # l.parse()
 # l.print()
 #
