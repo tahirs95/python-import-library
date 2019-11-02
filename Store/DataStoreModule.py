@@ -34,7 +34,6 @@ class DataStore:
 
         connectionString = '{}://{}:{}@{}:{}/{}'.format(driver, db_username, db_password, db_host, db_port, db_name)
         self.engine = create_engine(connectionString, echo=False)
-        Base.metadata.bind = self.engine
 
         self.missing_data_resolver = missing_data_resolver
 
@@ -52,12 +51,17 @@ class DataStore:
         # TEMP list of values for defaulted IDs, to be replaced by missing info lookup mechanism
         self.defaultUserId = 1  # DevUser
 
-        if db_type == 'sqlite':
+        self.db_name = db_name
+        self.db_type = db_type
+
+    def initialise(self):
+        Base.metadata.bind = self.engine
+        if self.db_type == 'sqlite':
             try:
                 # Attempt to create schema if not present, to cope with fresh DB file
                 Base.metadata.create_all(self.engine)
             except OperationalError:
-                print("Error creating database schema, possible invalid path? ('" + db_name + "'). Quitting")
+                print("Error creating database schema, possible invalid path? ('" + self.db_name + "'). Quitting")
                 exit()
 
     @contextmanager
