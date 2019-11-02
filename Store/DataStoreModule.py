@@ -57,6 +57,8 @@ class DataStore:
         self.db_type = db_type
 
     def initialise(self):
+        """Create schemas for the database"""
+
         Base.metadata.bind = self.engine
         if self.db_type == 'sqlite':
             try:
