@@ -107,10 +107,13 @@ class State:
         self.setHeading(valid_heading * self.unitreg.degree)
 
         try:
-            self.speed = float(speedToken)
+            valid_speed = float(speedToken)
         except ValueError:
             print("Line {}. Error in speed value {}. Couldn't convert to a number".format(self.lineNum, speedToken))
             return False
+        
+        # Set speed as knots(quantity-with-unit) object
+        self.setSpeed(valid_speed * self.unitreg.knot)
 
         try:
             if depthToken == 'NaN':
@@ -171,7 +174,8 @@ class State:
         return heading_in_radians.magnitude
 
     def getSpeed(self):
-        return self.speed
+        speed_in_mps = self.speed.to(self.unitreg.metre / self.unitreg.second)
+        return speed_in_mps.magnitude
 
     def getDepth(self):
         return self.depth
