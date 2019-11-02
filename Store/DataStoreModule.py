@@ -20,33 +20,20 @@ class DataStore:
 
     # TODO: supply or lookup user id
     # Valid options for db_type are 'postgres' and 'sqlite'
-    def __init__(
-        self,
-        db_username,
-        db_password,
-        db_host,
-        db_port,
-        db_name,
-        db_type="postgres",
-        missing_data_resolver=DefaultsResolver(),
-    ):
-        if db_type == "postgres":
-            self.DBClasses = import_module("Store.PostgresDB")
-            driver = "postgresql+psycopg2"
-        elif db_type == "sqlite":
-            self.DBClasses = import_module("Store.SqliteDB")
-            driver = "sqlite+pysqlite"
+    def __init__(self, db_username, db_password, db_host, db_port, db_name, db_type='postgres', missing_data_resolver=DefaultsResolver()):
+        if db_type == 'postgres':
+            self.DBClasses = import_module('Store.PostgresDB')
+            driver = 'postgresql+psycopg2'
+        elif db_type == 'sqlite':
+            self.DBClasses = import_module('Store.SqliteDB')
+            driver = 'sqlite+pysqlite'
         else:
-            raise Exception(
-                f"Unknown db_type {db_type} supplied, if specified should be one of 'postgres' or 'sqlite'"
-            )
+            raise Exception(f"Unknown db_type {db_type} supplied, if specified should be one of 'postgres' or 'sqlite'")
 
         # setup table type data
         self.setupTabletypeMap()
 
-        connectionString = "{}://{}:{}@{}:{}/{}".format(
-            driver, db_username, db_password, db_host, db_port, db_name
-        )
+        connectionString = '{}://{}:{}@{}:{}/{}'.format(driver, db_username, db_password, db_host, db_port, db_name)
         self.engine = create_engine(connectionString, echo=False)
 
         self.missing_data_resolver = missing_data_resolver
@@ -73,30 +60,20 @@ class DataStore:
         """Create schemas for the database"""
 
         Base.metadata.bind = self.engine
-        if self.db_type == "sqlite":
+        if self.db_type == 'sqlite':
             try:
                 # Attempt to create schema if not present, to cope with fresh DB file
                 Base.metadata.create_all(self.engine)
             except OperationalError:
-                print(
-                    "Error creating database schema, possible invalid path? ('"
-                    + self.db_name
-                    + "'). Quitting"
-                )
+                print("Error creating database schema, possible invalid path? ('" + self.db_name + "'). Quitting")
                 exit()
-        elif self.db_type == "postgres":
+        elif self.db_type == 'postgres':
             try:
-                # ensure that create schema scripts created before create table scripts
-                event.listen(
-                    Base.metadata, "before_create", CreateSchema("datastore_schema")
-                )
+                #  ensure that create schema scripts created before create table scripts
+                event.listen(Base.metadata, 'before_create', CreateSchema('datastore_schema'))
                 Base.metadata.create_all(self.engine)
             except OperationalError:
-                print(
-                    "Error creating database schema, possible invalid path? ('"
-                    + self.db_name
-                    + "'). Quitting"
-                )
+                print("Error creating database schema, possible invalid path? ('" + self.db_name + "'). Quitting")
                 exit()
 
     @contextmanager
@@ -112,6 +89,7 @@ class DataStore:
             raise
         finally:
             self.session.close()
+
 
     #############################################################
     # Add functions
@@ -130,7 +108,8 @@ class DataStore:
 
         # enough info to proceed and create entry
         tableTypeObj = self.DBClasses.TableType(
-            tabletype_id=tabletype_id, name=tablename
+            tabletype_id=tabletype_id,
+            name=tablename
         )
         self.session.add(tableTypeObj)
         self.session.flush()
@@ -146,7 +125,8 @@ class DataStore:
 
         # No cache for entries, just add new one when called
         entry_obj = self.DBClasses.Entry(
-            tabletype_id=tabletypeId, created_user=self.defaultUserId
+            tabletype_id=tabletypeId,
+            created_user=self.defaultUserId
         )
 
         self.session.add(entry_obj)
