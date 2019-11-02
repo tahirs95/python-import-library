@@ -214,7 +214,9 @@ class DataStore:
             return datafile_type_lookup
 
         # proceed and create entry
-        datafile_type_obj = self.DBClasses.DatafileType(name=datafile_type)
+        datafile_type_obj = self.DBClasses.DatafileType(
+            name=datafile_type
+        )
 
         self.session.add(datafile_type_obj)
         self.session.flush()
@@ -239,18 +241,12 @@ class DataStore:
         datafile_type_obj = self.addDatafileType(datafileType)
 
         # don't know privacy, use resolver to query for data
-        missingPrivacyData = self.missing_data_resolver.resolvePrivacy(
-            self,
-            self.DBClasses.Datafile.tabletypeId,
-            self.DBClasses.Datafile.__tablename__,
-        )
+        missingPrivacyData = self.missing_data_resolver.resolvePrivacy(self, self.DBClasses.Datafile.tabletypeId, self.DBClasses.Datafile.__tablename__)
 
         # missingPrivacyData should contain (tabletype, privacyName)
         # enough info to proceed and create entry
         chosenTableType, chosenPrivacy = missingPrivacyData
-        entry_id = self.addEntry(
-            self.DBClasses.Datafile.tabletypeId, self.DBClasses.Datafile.__tablename__
-        )
+        entry_id = self.addEntry(self.DBClasses.Datafile.tabletypeId, self.DBClasses.Datafile.__tablename__)
 
         datafile_obj = self.DBClasses.Datafile(
             datafile_id=entry_id,
@@ -258,7 +254,7 @@ class DataStore:
             reference=datafileName,
             url=None,
             privacy_id=chosenPrivacy.privacy_id,
-            datafiletype_id=datafile_type_obj.datafiletype_id,
+            datafiletype_id=datafile_type_obj.datafiletype_id
         )
 
         self.session.add(datafile_obj)
@@ -281,23 +277,19 @@ class DataStore:
             return platformlookup
 
         # doesn't exist in DB, use resolver to query for data
-        missingPlatformData = self.missing_data_resolver.resolvePlatform(
-            self, platformName
-        )
+        missingPlatformData = self.missing_data_resolver.resolvePlatform(self, platformName)
 
         # missingPlatformData should contain (platformName, chosenClass, chosenNationality)
         # enough info to proceed and create entry
         chosenPlatformName, chosenClass, chosenNationality = missingPlatformData
-        entry_id = self.addEntry(
-            self.DBClasses.Platform.tabletypeId, self.DBClasses.Platform.__tablename__
-        )
+        entry_id = self.addEntry(self.DBClasses.Platform.tabletypeId, self.DBClasses.Platform.__tablename__)
 
         platform_obj = self.DBClasses.Platform(
             platform_id=entry_id,
             name=platformName,
             platformtype_id=chosenClass.platformtype_id,
             host_platform_id=None,
-            nationality_id=chosenNationality.nationality_id,
+            nationality_id=chosenNationality.nationality_id
         )
 
         self.session.add(platform_obj)
@@ -348,15 +340,13 @@ class DataStore:
         # missingSensorData should contain (sensorName, sensorType)
         # enough info to proceed and create entry
         chosenSensorName, chosenSensorType = missingSensorData
-        entry_id = self.addEntry(
-            self.DBClasses.Sensor.tabletypeId, self.DBClasses.Sensor.__tablename__
-        )
+        entry_id = self.addEntry(self.DBClasses.Sensor.tabletypeId, self.DBClasses.Sensor.__tablename__)
 
         sensor_obj = self.DBClasses.Sensor(
             sensor_id=entry_id,
             name=sensorName,
             sensortype_id=self.DBClasses.mapUUIDType(chosenSensorType.sensortype_id),
-            platform_id=self.DBClasses.mapUUIDType(platform.platform_id),
+            platform_id=self.DBClasses.mapUUIDType(platform.platform_id)
         )
 
         self.session.add(sensor_obj)
@@ -371,108 +361,70 @@ class DataStore:
         # No cache for entries, just add new one when called
 
         # don't know privacy, use resolver to query for data
-        missingPrivacyData = self.missing_data_resolver.resolvePrivacy(
-            self, self.DBClasses.State.tabletypeId, self.DBClasses.State.__tablename__
-        )
+        missingPrivacyData = self.missing_data_resolver.resolvePrivacy(self, self.DBClasses.State.tabletypeId, self.DBClasses.State.__tablename__)
 
         # missingPrivacyData should contain (tabletype, privacyName)
         # enough info to proceed and create entry
         chosenTableType, chosenPrivacy = missingPrivacyData
-        entry_id = self.addEntry(
-            self.DBClasses.State.tabletypeId, self.DBClasses.State.__tablename__
-        )
+        entry_id = self.addEntry(self.DBClasses.State.tabletypeId, self.DBClasses.State.__tablename__)
 
         state_obj = self.DBClasses.State(
             state_id=entry_id,
             time=timestamp,
             sensor_id=sensor.sensor_id,
-            location="(" + str(long.degrees) + "," + str(lat.degrees) + ")",
+            location='('+str(long.degrees)+','+str(lat.degrees)+')',
             heading=heading,
             # TODO: how to calculate course?
-            # course=,
+            #course=,
             speed=speed,
             datafile_id=datafile.datafile_id,
-            privacy_id=chosenPrivacy.privacy_id,
+            privacy_id=chosenPrivacy.privacy_id
         )
         self.session.add(state_obj)
         self.session.flush()
 
         return state_obj
 
+
     #############################################################
     # Search/lookup functions
 
     def searchDatafileType(self, datafileTypeSearchName):
         # search for any datafile type with this name
-        return (
-            self.session.query(self.DBClasses.DatafileType)
-            .filter(self.DBClasses.DatafileType.name == datafileTypeSearchName)
-            .first()
-        )
+        return self.session.query(self.DBClasses.DatafileType).filter(self.DBClasses.DatafileType.name == datafileTypeSearchName).first()
 
     def searchDatafile(self, datafileSearchName):
         # search for any datafile with this name
-        return (
-            self.session.query(self.DBClasses.Datafile)
-            .filter(self.DBClasses.Datafile.reference == datafileSearchName)
-            .first()
-        )
+        return self.session.query(self.DBClasses.Datafile).filter(self.DBClasses.Datafile.reference == datafileSearchName).first()
 
     def searchPlatform(self, platformSearchName):
         # search for any platform with this name
-        return (
-            self.session.query(self.DBClasses.Platform)
-            .filter(self.DBClasses.Platform.name == platformSearchName)
-            .first()
-        )
+        return self.session.query(self.DBClasses.Platform).filter(self.DBClasses.Platform.name == platformSearchName).first()
 
     def searchPlatformType(self, platformTypeSearchName):
         # search for any platform type with this name
-        return (
-            self.session.query(self.DBClasses.PlatformType)
-            .filter(self.DBClasses.PlatformType.name == platformTypeSearchName)
-            .first()
-        )
+        return self.session.query(self.DBClasses.PlatformType).filter(self.DBClasses.PlatformType.name == platformTypeSearchName).first()
 
     def searchNationality(self, nationalitySearchName):
         # search for any nationality with this name
-        return (
-            self.session.query(self.DBClasses.Nationality)
-            .filter(self.DBClasses.Nationality.name == nationalitySearchName)
-            .first()
-        )
+        return self.session.query(self.DBClasses.Nationality).filter(self.DBClasses.Nationality.name == nationalitySearchName).first()
 
     def searchSensor(self, sensorSearchName):
         # search for any sensor type featuring this name
-        return (
-            self.session.query(self.DBClasses.Sensor)
-            .filter(self.DBClasses.Sensor.name == sensorSearchName)
-            .first()
-        )
+        return self.session.query(self.DBClasses.Sensor).filter(self.DBClasses.Sensor.name == sensorSearchName).first()
 
     def searchSensorType(self, sensorTypeSearchName):
         # search for any sensor type featuring this name
-        return (
-            self.session.query(self.DBClasses.SensorType)
-            .filter(self.DBClasses.SensorType.name == sensorTypeSearchName)
-            .first()
-        )
+        return self.session.query(self.DBClasses.SensorType).filter(self.DBClasses.SensorType.name == sensorTypeSearchName).first()
 
     def searchPrivacy(self, privacySearchName):
         # search for any privacy with this name
-        return (
-            self.session.query(self.DBClasses.Privacy)
-            .filter(self.DBClasses.Privacy.name == privacySearchName)
-            .first()
-        )
+        return self.session.query(self.DBClasses.Privacy).filter(self.DBClasses.Privacy.name == privacySearchName).first()
 
     def searchTableType(self, tabletype_id):
         # search for any table type with this id
-        return (
-            self.session.query(self.DBClasses.TableType)
-            .filter(self.DBClasses.TableType.tabletype_id == tabletype_id)
-            .first()
-        )
+        return self.session.query(self.DBClasses.TableType).filter(self.DBClasses.TableType.tabletype_id == tabletype_id).first()
+
 
     #############################################################
     # Get functions
@@ -499,18 +451,8 @@ class DataStore:
 
     def getSensorsByPlatformType(self, platformType):
         # given platform type, return all Sensors contained on platforms of that type
-        return (
-            self.session.query(self.DBClasses.Platform, self.DBClasses.Sensor)
-            .join(
-                self.DBClasses.Sensor,
-                self.DBClasses.Sensor.platform_id
-                == self.DBClasses.Platform.platform_id,
-            )
-            .filter(
-                self.DBClasses.Platform.platformtype_id == platformType.platformtype_id
-            )
-            .all()
-        )
+        return self.session.query(self.DBClasses.Platform, self.DBClasses.Sensor).join(self.DBClasses.Sensor, self.DBClasses.Sensor.platform_id == self.DBClasses.Platform.platform_id).filter(self.DBClasses.Platform.platformtype_id == platformType.platformtype_id).all()
+
 
     #############################################################
     # Validation/check functions
@@ -520,9 +462,7 @@ class DataStore:
         if len(nationality) == 0:
             return False
 
-        if next(
-            (nat for nat in self.getNationalities() if nat.name == nationality), None
-        ):
+        if next((nat for nat in self.getNationalities() if nat.name == nationality), None):
             # A nationality already exists with that name
             return False
 
@@ -544,9 +484,7 @@ class DataStore:
         if len(platformType) == 0:
             return False
 
-        if next(
-            (pt for pt in self.getPlatformTypes() if pt.name == platformType), None
-        ):
+        if next((pt for pt in self.getPlatformTypes() if pt.name == platformType), None):
             # A platform type already exists with that name
             return False
 
@@ -574,27 +512,17 @@ class DataStore:
 
         return True
 
+
     #############################################################
     # Generic Metadata functions
 
     def setupTabletypeMap(self):
         # setup a map of tables keyed by TableType
-        dbclasses = dict(
-            [
-                (name, cls)
-                for name, cls in self.DBClasses.__dict__.items()
-                if isinstance(cls, type)
-                and issubclass(cls, Base)
-                and cls.__name__ != "Base"
-            ]
-        )
+        dbclasses = dict([(name, cls) for name, cls in self.DBClasses.__dict__.items() if isinstance(cls, type)
+                          and issubclass(cls, Base) and cls.__name__ != 'Base'])
         self.metaClasses = {}
         for tabletype in TableTypes:
-            self.metaClasses[tabletype] = [
-                cls
-                for name, cls in dbclasses.items()
-                if dbclasses[name].tabletype == tabletype
-            ]
+            self.metaClasses[tabletype] = [cls for name, cls in dbclasses.items() if dbclasses[name].tabletype == tabletype]
 
     def getTabletypeData(self, tabletypes):
         retmap = {}
