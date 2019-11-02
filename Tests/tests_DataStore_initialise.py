@@ -1,8 +1,7 @@
 import unittest
 
 from Store.DataStoreModule import DataStore
-from testing.postgresql import Postgresql
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import inspect
 
 
 class TestDataStoreInitialise(unittest.TestCase):
