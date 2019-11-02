@@ -2,19 +2,32 @@ import unittest
 
 from Store.DataStoreModule import DataStore
 from testing.postgresql import Postgresql
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 
 
 class TestDataStoreInitialise(unittest.TestCase):
-    def setUp(self):
-        self.postgres = Postgresql(port=5432)
-
-    def tearDown(self):
-        self.postgres.stop()
+    # def setUp(self):
+    #     self.postgres = Postgresql(port=5432)
+    #
+    # def tearDown(self):
+    #     self.postgres.stop()
 
     def test_sqlite_initialise(self):
         """Test whether schemas created successfully on SQLite"""
         data_store_sqlite = DataStore("", "", "", 0, ":memory:", db_type="sqlite")
+        inspector = inspect(data_store_sqlite.engine)
+        table_names = inspector.get_table_names()
+        self.assertEqual(len(table_names), 0)
+
+        data_store_sqlite.initialise()
+        inspector = inspect(data_store_sqlite.engine)
+        table_names = inspector.get_table_names()
+        self.assertEqual(len(table_names), 11)
+        self.assertIn("Entry", table_names)
+        self.assertIn("Platforms", table_names)
+        self.assertIn("State", table_names)
+        self.assertIn("Datafiles", table_names)
+        self.assertIn("Nationalities", table_names)
 
     def test_postgres_initialise(self):
         # TODO: not working yet
