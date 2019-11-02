@@ -67,7 +67,8 @@ class DataStore:
                 exit()
         elif self.db_type == 'postgres':
             try:
-                event.listen(Base.metadata, 'before_create', CreateSchema(self.engine))
+                event.listen(Base.metadata, 'before_create', CreateSchema('datastore_schema'))
+                Base.metadata.create_all(self.engine)
             except OperationalError:
                 print("Error creating database schema, possible invalid path? ('" + self.db_name + "'). Quitting")
                 exit()
