@@ -1,5 +1,6 @@
 from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.schema import CreateSchema
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 from importlib import import_module
@@ -51,6 +52,7 @@ class DataStore:
         # TEMP list of values for defaulted IDs, to be replaced by missing info lookup mechanism
         self.defaultUserId = 1  # DevUser
 
+        # Instance attributes which are necessary for initialise method
         self.db_name = db_name
         self.db_type = db_type
 
@@ -60,6 +62,12 @@ class DataStore:
             try:
                 # Attempt to create schema if not present, to cope with fresh DB file
                 Base.metadata.create_all(self.engine)
+            except OperationalError:
+                print("Error creating database schema, possible invalid path? ('" + self.db_name + "'). Quitting")
+                exit()
+        elif self.db_type == 'postgres':
+            try:
+                event.listen(Base.metadata, 'before_create', CreateSchema(self.engine))
             except OperationalError:
                 print("Error creating database schema, possible invalid path? ('" + self.db_name + "'). Quitting")
                 exit()
