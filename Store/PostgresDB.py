@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import TIME
 from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION
 
 from Store.DBBase import Base
+from Store.DBStatus import TableTypes
 
 def mapUUIDType(val):
     # postgres needs to map to string
@@ -11,6 +12,7 @@ def mapUUIDType(val):
 
 class Entry(Base):
     __tablename__ = 'Entry'
+    tabletype = TableTypes.METADATA
 
     entry_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     tabletype_id = Column(Integer, nullable=False)
@@ -18,12 +20,14 @@ class Entry(Base):
 
 class TableType(Base):
     __tablename__ = 'TableTypes'
+    tabletype = TableTypes.METADATA
 
     tabletype_id = Column(Integer, nullable=False, primary_key=True)
     name = Column(String(150))
 
 class SensorType(Base):
     __tablename__ = 'SensorTypes'
+    tabletype = TableTypes.REFERENCE
 
     sensortype_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     # TODO: does this, or other string limits need checking or validating on file import?
@@ -31,6 +35,7 @@ class SensorType(Base):
 
 class Sensor(Base):
     __tablename__ = 'Sensors'
+    tabletype = TableTypes.METADATA
     tabletypeId = 2  # Only needed for tables referenced by Entry table
 
     sensor_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
@@ -40,6 +45,7 @@ class Sensor(Base):
 
 class PlatformType(Base):
     __tablename__ = 'PlatformTypes'
+    tabletype = TableTypes.REFERENCE
 
     platformtype_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     # TODO: does this, or other string limits need checking or validating on file import?
@@ -48,6 +54,7 @@ class PlatformType(Base):
 
 class Platform(Base):
     __tablename__ = 'Platforms'
+    tabletype = TableTypes.METADATA
     tabletypeId = 1  # Only needed for tables referenced by Entry table
 
     platform_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
@@ -60,6 +67,7 @@ class Platform(Base):
 
 class DatafileType(Base):
     __tablename__ = 'DatafileTypes'
+    tabletype = TableTypes.REFERENCE
 
     datafiletype_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     # TODO: does this, or other string limits need checking or validating on file import?
@@ -67,6 +75,7 @@ class DatafileType(Base):
 
 class Datafile(Base):
     __tablename__ = 'Datafiles'
+    tabletype = TableTypes.METADATA
     tabletypeId = 4  # Only needed for tables referenced by Entry table
 
     datafile_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
@@ -80,6 +89,7 @@ class Datafile(Base):
 
 class State(Base):
     __tablename__ = 'State'
+    tabletype = TableTypes.MEASUREMENT
     tabletypeId = 3  # Only needed for tables referenced by Entry table
 
     state_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
@@ -95,12 +105,14 @@ class State(Base):
 
 class Nationality(Base):
     __tablename__ = 'Nationalities'
+    tabletype = TableTypes.REFERENCE
 
     nationality_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     name = Column(String(150), nullable=False)
 
 class Privacy(Base):
     __tablename__ = 'Privacies'
+    tabletype = TableTypes.REFERENCE
 
     privacy_id = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())
     name = Column(String(150), nullable=False)

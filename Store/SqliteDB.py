@@ -4,6 +4,7 @@ from sqlalchemy.dialects.sqlite import REAL
 import uuid
 
 from Store.DBBase import Base
+from Store.DBStatus import TableTypes
 from Store.UUID import UUID
 
 def mapUUIDType(val):
@@ -12,6 +13,7 @@ def mapUUIDType(val):
 
 class Entry(Base):
     __tablename__ = 'Entry'
+    tabletype = TableTypes.METADATA
 
     entry_id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     tabletype_id = Column(Integer, nullable=False)
@@ -19,12 +21,14 @@ class Entry(Base):
 
 class TableType(Base):
     __tablename__ = 'TableTypes'
+    tabletype = TableTypes.METADATA
 
     tabletype_id = Column(Integer, nullable=False, primary_key=True)
     name = Column(String(150))
 
 class SensorType(Base):
     __tablename__ = 'SensorTypes'
+    tabletype = TableTypes.REFERENCE
 
     sensortype_id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     # TODO: does this, or other string limits need checking or validating on file import?
@@ -32,6 +36,7 @@ class SensorType(Base):
 
 class Sensor(Base):
     __tablename__ = 'Sensors'
+    tabletype = TableTypes.METADATA
 
     # These only needed for tables referenced by Entry table
     tabletypeId = 2
@@ -44,6 +49,7 @@ class Sensor(Base):
 
 class PlatformType(Base):
     __tablename__ = 'PlatformTypes'
+    tabletype = TableTypes.REFERENCE
 
     platformtype_id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     # TODO: does this, or other string limits need checking or validating on file import?
@@ -52,6 +58,7 @@ class PlatformType(Base):
 
 class Platform(Base):
     __tablename__ = 'Platforms'
+    tabletype = TableTypes.METADATA
 
     # These only needed for tables referenced by Entry table
     tabletypeId = 1
@@ -67,6 +74,7 @@ class Platform(Base):
 
 class DatafileType(Base):
     __tablename__ = 'DatafileTypes'
+    tabletype = TableTypes.REFERENCE
 
     datafiletype_id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     # TODO: does this, or other string limits need checking or validating on file import?
@@ -74,6 +82,7 @@ class DatafileType(Base):
 
 class Datafile(Base):
     __tablename__ = 'Datafiles'
+    tabletype = TableTypes.METADATA
 
     # These only needed for tables referenced by Entry table
     tabletypeId = 4
@@ -90,6 +99,7 @@ class Datafile(Base):
 
 class State(Base):
     __tablename__ = 'State'
+    tabletype = TableTypes.MEASUREMENT
 
     # These only needed for tables referenced by Entry table
     tabletypeId = 3
@@ -108,12 +118,14 @@ class State(Base):
 
 class Nationality(Base):
     __tablename__ = 'Nationalities'
+    tabletype = TableTypes.REFERENCE
 
     nationality_id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     name = Column(String(150), nullable=False)
 
 class Privacy(Base):
     __tablename__ = 'Privacies'
+    tabletype = TableTypes.REFERENCE
 
     privacy_id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     name = Column(String(150), nullable=False)
