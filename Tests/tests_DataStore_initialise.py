@@ -6,9 +6,13 @@ from sqlalchemy import inspect
 
 class TestDataStoreInitialisePostgres(TestCase):
     def setUp(self):
-        self.postgres = Postgresql(
-            database="test", host="localhost", user="postgres", port=55527
-        )
+        try:
+            self.postgres = Postgresql(
+                database="test", host="localhost", user="postgres", port=55527
+            )
+        except RuntimeError as e:
+            raise Exception("PostgreSQL database couldn't be created! "
+                            "Test is skipping.")
 
     def tearDown(self):
         self.postgres.stop()
