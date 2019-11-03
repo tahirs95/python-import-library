@@ -3,7 +3,7 @@ from sqlalchemy.dialects.sqlite import DATETIME
 from sqlalchemy.dialects.sqlite import REAL
 import uuid
 
-from Store.DBBase import Base
+from Store.DBBase import BaseSQLite as Base
 from Store.DBStatus import TableTypes
 from Store.UUID import UUID
 

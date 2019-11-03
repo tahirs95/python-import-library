@@ -3,3 +3,4 @@ geoalchemy2
 psycopg2
 nose2==0.9.1
 pint==0.8
+testing.postgresql

@@ -1,15 +1,15 @@
 import os, sys
 import unittest
+import datetime
 
 from Formats.REPFile import REPFile
 from Formats.State import State
+from Formats.Location import Location
 
 path = os.path.abspath(__file__)
 dir_path = os.path.dirname(path)
 TEST_FILE = os.path.join(dir_path, "reptest1.rep")
 ERROR_TEST_FILE = os.path.join(dir_path, "reptest2.rep")
-
-
 
 class BasicTests(unittest.TestCase):
 
@@ -48,6 +48,12 @@ class BasicTests(unittest.TestCase):
         repfile = REPFile(TEST_FILE)
         self.assertEqual(8, len(repfile.getLines()))
 
+    def test_FileTypes(self):
+        repfile = REPFile(TEST_FILE)
+        self.assertEqual("REP", repfile.getDatafileType())
+        self.assertEqual(TEST_FILE, repfile.getDatafileName())
+
+
     def test_fileParseError(self):
         excep_thrown = False
         try:
@@ -56,6 +62,7 @@ class BasicTests(unittest.TestCase):
             excep_thrown = True
 
         self.assertTrue(excep_thrown)
+<<<<<<< HEAD:Tests/test_REPFile.py
 
     ####################
     #### line tests ####
@@ -95,5 +102,8 @@ class BasicTests(unittest.TestCase):
 
 
 
+=======
+   
+>>>>>>> develop:Tests/test_REPFile_state.py
 if __name__ == "__main__":
     unittest.main()
