@@ -6,7 +6,7 @@ from sqlalchemy.exc import OperationalError
 from importlib import import_module
 from contextlib import contextmanager
 
-from Store.DBBase import Base
+from Store.DBBase import BasePostgres, BaseSQLite
 from Store.DBStatus import TableTypes
 from Resolvers.DefaultsResolver import DefaultsResolver
 
@@ -36,6 +36,11 @@ class DataStore:
         connectionString = '{}://{}:{}@{}:{}/{}'.format(driver, db_username, db_password, db_host, db_port, db_name)
         self.engine = create_engine(connectionString, echo=False)
 
+        if db_type == 'postgres':
+            BasePostgres.metadata.bind = self.engine
+        elif db_type == 'sqlite':
+            BaseSQLite.metadata.bind = self.engine
+
         self.missing_data_resolver = missing_data_resolver
 
         # caches of known data
@@ -59,19 +64,18 @@ class DataStore:
     def initialise(self):
         """Create schemas for the database"""
 
-        Base.metadata.bind = self.engine
         if self.db_type == 'sqlite':
             try:
                 # Attempt to create schema if not present, to cope with fresh DB file
-                Base.metadata.create_all(self.engine)
+                BaseSQLite.metadata.create_all(self.engine)
             except OperationalError:
                 print("Error creating database schema, possible invalid path? ('" + self.db_name + "'). Quitting")
                 exit()
         elif self.db_type == 'postgres':
             try:
                 #  ensure that create schema scripts created before create table scripts
-                event.listen(Base.metadata, 'before_create', CreateSchema('datastore_schema'))
-                Base.metadata.create_all(self.engine)
+                event.listen(BasePostgres.metadata, 'before_create', CreateSchema('datastore_schema'))
+                BasePostgres.metadata.create_all(self.engine)
             except OperationalError:
                 print("Error creating database schema, possible invalid path? ('" + self.db_name + "'). Quitting")
                 exit()
@@ -519,7 +523,7 @@ class DataStore:
     def setupTabletypeMap(self):
         # setup a map of tables keyed by TableType
         dbclasses = dict([(name, cls) for name, cls in self.DBClasses.__dict__.items() if isinstance(cls, type)
-                          and issubclass(cls, Base) and cls.__name__ != 'Base'])
+                          and (issubclass(cls, BasePostgres) or issubclass(cls, BaseSQLite)) and cls.__name__ != 'Base'])
         self.metaClasses = {}
         for tabletype in TableTypes:
             self.metaClasses[tabletype] = [cls for name, cls in dbclasses.items() if dbclasses[name].tabletype == tabletype]
