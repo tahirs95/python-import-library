@@ -1,3 +1,14 @@
+# Code coverage
+
+We're aiming for 100% code coverage on the project, track our progress here:  [![codecov](https://codecov.io/gh/debrief/python-import-library/branch/develop/graph/badge.svg)](https://codecov.io/gh/debrief/python-import-library)
+
+# Jupyter demo
+
+Link to working demo of datafile import: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/debrief/python-import-library/master?filepath=jupyter%2FDataStore_sqliteExperiment.ipynb)
+
+Placeholder for live Jupyter view of whole repo
+[![Master branch](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/debrief/python-import-library/master)
+
 # Setup
 
 To prepare for running ensure these tools and packages are installed:
@@ -38,9 +49,4 @@ Mark the `Store` package as source by right clicking on the directory and select
 
 Open any python module you want to run in the main editor window, right click anywhere in the editor and choose the `Run` or `Debug` option
 
-# Jupyter demo
 
-Link to working demo of datafile import: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/debrief/python-import-library/master?filepath=jupyter%2FDataStore_sqliteExperiment.ipynb)
-
-Placeholder for live Jupyter view of whole repo
-[![Master branch](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/debrief/python-import-library/master)
