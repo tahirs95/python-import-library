@@ -588,12 +588,14 @@ class DataStore:
 
         with open(file_name, "r") as f:
             reader = csv.DictReader(f)
-            # header = next(reader)
-            for row in reader:
-                print(row)
+            # TODO: use add methods to insert each row to table
 
     def populateData(self, table_name, file_name):
         """Import given CSV file to the given metadata/measurement table"""
         if table_name not in METADATA_TABLES+MEASUREMENT_TABLES:
             raise Exception(f"There isn't any table names {table_name} "
                             f"in the database!")
+
+        with open(file_name, "r") as f:
+            reader = csv.DictReader(f)
+            # TODO: use add methods to insert each row to table
