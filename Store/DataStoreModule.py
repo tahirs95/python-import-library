@@ -77,7 +77,7 @@ class DataStore:
                 event.listen(BasePostgres.metadata, 'before_create', CreateSchema('datastore_schema'))
                 BasePostgres.metadata.create_all(self.engine)
             except OperationalError:
-                print("Error creating database schema, possible invalid path? ('" + self.db_name + "'). Quitting")
+                print(f"Error creating database({self.db_name})! Quitting")
                 exit()
 
     @contextmanager
