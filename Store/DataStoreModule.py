@@ -17,6 +17,48 @@ from Resolvers.DefaultsResolver import DefaultsResolver
 
 # TODO: probably move this module to the top level as it's the main one
 
+# Tables names
+REFERENCE_TABLES = [
+    "PlatformTypes",
+    "Nationalities",
+    "GeometryTypes",
+    "GeometrySubTypes",
+    "Users",
+    "unitTypes",
+    "ClassificationTypes",
+    "ContactTypes",
+    "SensorTypes",
+    "Privacies",
+    "DatafileTypes",
+    "MediaTypes",
+    "CommentTypes",
+    "CommodityTypes",
+    "ConfidenceLevels",
+]
+METADATA_TABLES = [
+    "HostedBy",
+    "Platforms",
+    "Participation",
+    "Tasks",
+    "Tags",
+    "Tagged Item",
+    "Log",
+    "Extractions",
+    "Changes",
+    "Sensors",
+    "Datafiles",
+    "Synonyms",
+]
+MEASUREMENT_TABLES = [
+    "State",
+    "Contacts",
+    "Activations",
+    "LogsHoldings",
+    "Comments",
+    "Geometries",
+    "Media",
+]
+
 
 class DataStore:
 
@@ -539,10 +581,8 @@ class DataStore:
 
     # Populate method in order to import CSV files
     def populateReference(self, table_name, file_name):
-        """Import given CSV file to the given table"""
-        # TODO: list isn't completed yet
-        table_names = ["PlatformTypes", "Nationalities", "GeometryTypes"]
-        if table_name not in table_names:
+        """Import given CSV file to the given reference table"""
+        if table_name not in REFERENCE_TABLES:
             raise Exception(f"There isn't any table named {table_name} "
                             f"in the database!")
 
@@ -552,5 +592,8 @@ class DataStore:
             for row in reader:
                 print(row)
 
-    def populateData(self):
-        pass
+    def populateData(self, table_name, file_name):
+        """Import given CSV file to the given metadata/measurement table"""
+        if table_name not in METADATA_TABLES+MEASUREMENT_TABLES:
+            raise Exception(f"There isn't any table names {table_name} "
+                            f"in the database!")
