@@ -62,7 +62,6 @@ class BasicTests(unittest.TestCase):
             excep_thrown = True
 
         self.assertTrue(excep_thrown)
-<<<<<<< HEAD:Tests/test_REPFile.py
 
     ####################
     #### line tests ####
@@ -102,8 +101,5 @@ class BasicTests(unittest.TestCase):
 
 
 
-=======
-   
->>>>>>> develop:Tests/test_REPFile_state.py
 if __name__ == "__main__":
     unittest.main()
