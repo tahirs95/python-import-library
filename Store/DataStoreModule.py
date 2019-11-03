@@ -586,9 +586,12 @@ class DataStore:
             raise Exception(f"There isn't any table named {table_name} "
                             f"in the database!")
 
+        # TODO: use add methods to insert each row to table
         with open(file_name, "r") as f:
             reader = csv.DictReader(f)
-            # TODO: use add methods to insert each row to table
+            with self.session_scope() as session:
+                for row in reader:
+                    session.addNationality(row["name"])
 
     def populateData(self, table_name, file_name):
         """Import given CSV file to the given metadata/measurement table"""
