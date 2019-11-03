@@ -1,3 +1,4 @@
+import unittest
 from unittest import TestCase
 from testing.postgresql import Postgresql
 from Store.DataStoreModule import DataStore
@@ -82,3 +83,6 @@ class TestDataStoreInitialiseSQLite(TestCase):
         self.assertIn("State", table_names)
         self.assertIn("Datafiles", table_names)
         self.assertIn("Nationalities", table_names)
+
+if __name__ == "__main__":
+    unittest.main()
