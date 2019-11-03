@@ -1,3 +1,5 @@
+import csv
+
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -515,8 +517,20 @@ class DataStore:
                 retmap[table.__name__] = self.session.query(table).count()
         return retmap
 
-    def populateReference(self):
-        pass
+    # Populate method in order to import CSV files
+    def populateReference(self, table_name, file_name):
+        """Import given CSV file to the given table"""
+        # TODO: list isn't completed yet
+        table_names = ["PlatformTypes", "Nationalities", "GeometryTypes"]
+        if table_name not in table_names:
+            raise Exception(f"There isn't any table named {table_name} "
+                            f"in the database!")
+
+        with open(file_name, "r") as f:
+            reader = csv.DictReader(f)
+            # header = next(reader)
+            for row in reader:
+                print(row)
 
     def populateData(self):
         pass
