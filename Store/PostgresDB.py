@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.dialects.postgresql import TIME
 from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION
 
-from Store.DBBase import Base
+from Store.DBBase import BasePostgres as Base
 from Store.DBStatus import TableTypes
 
 def mapUUIDType(val):
