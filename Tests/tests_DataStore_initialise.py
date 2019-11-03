@@ -7,19 +7,26 @@ from sqlalchemy import inspect
 
 class TestDataStoreInitialisePostgres(TestCase):
     def setUp(self):
+        self.postgres = None
         try:
             self.postgres = Postgresql(
                 database="test", host="localhost", user="postgres", port=55527
             )
-        except RuntimeError as e:
-            raise Exception("PostgreSQL database couldn't be created! "
-                            "Test is skipping.")
+        except RuntimeError:
+            print("PostgreSQL database couldn't be created! "
+                  "Test is skipping.")
 
     def tearDown(self):
-        self.postgres.stop()
+        try:
+            self.postgres.stop()
+        except AttributeError:
+            return
 
     def test_postgres_initialise(self):
         """Test whether schemas created successfully on PostgresSQL"""
+        if not self.postgres:
+            self.skipTest("Postgres is not available. Test is skipping")
+
         data_store_postgres = DataStore(
             db_username="postgres",
             db_password="",
