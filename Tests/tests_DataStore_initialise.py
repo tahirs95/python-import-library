@@ -1,10 +1,19 @@
 import unittest
 
+from testing.postgresql import Postgresql
 from Store.DataStoreModule import DataStore
 from sqlalchemy import inspect
 
 
 class TestDataStoreInitialise(unittest.TestCase):
+    def setUp(self):
+        self.postgres = Postgresql(
+            database="test", host="localhost", user="postgres", port=55527
+        )
+
+    def tearDown(self):
+        self.postgres.stop()
+
     def test_sqlite_initialise(self):
         """Test whether schemas created successfully on SQLite"""
         data_store_sqlite = DataStore("", "", "", 0, ":memory:", db_type="sqlite")
@@ -34,7 +43,11 @@ class TestDataStoreInitialise(unittest.TestCase):
     def test_postgres_initialise(self):
         """Test whether schemas created successfully on PostgresSQL"""
         data_store_postgres = DataStore(
-            "postgres", "postgres", "localhost", "5432", "postgres"
+            db_username="postgres",
+            db_password="",
+            db_host="localhost",
+            db_port=55527,
+            db_name="test",
         )
 
         # inspector makes it possible to load lists of schema, table, column
