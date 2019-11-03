@@ -55,7 +55,7 @@ class TestDataStoreInitialisePostgres(TestCase):
 class TestDataStoreInitialiseSQLite(TestCase):
     def test_sqlite_initialise(self):
         """Test whether schemas created successfully on SQLite"""
-        data_store_sqlite = DataStore("", "", "", 0, "test.db", db_type="sqlite")
+        data_store_sqlite = DataStore("", "", "", 0, ":memory:", db_type="sqlite")
 
         # inspector makes it possible to load lists of schema, table, column
         # information for the sqlalchemy engine
