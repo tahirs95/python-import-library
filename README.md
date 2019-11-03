@@ -1,3 +1,7 @@
+
+![Codecov](https://img.shields.io/codecov/c/github/debrief/python-import-library)
+
+
 # Setup
 
 To prepare for running ensure these tools and packages are installed:
