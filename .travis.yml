@@ -8,3 +8,12 @@ script:
   - coverage3 run -m unittest discover -v
 after_success:
   - coverage3 report
+addons:
+  postgresql: "10"
+  apt:
+    packages:
+      - postgresql-10-postgis-2.5
+before_script:
+  - psql -U postgres -c "CREATE EXTENSION postgis"
+services:
+  - postgresql
