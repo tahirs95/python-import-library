@@ -30,22 +30,26 @@ class UnitsTests(unittest.TestCase):
     ####################
 
 
-    def learnAboutParams(self, msg, heading: Quantity):
+    def learnAboutParams(self, msg, length: Quantity):
         # check the parameter is of the correct type
-        print("HEADING:" + repr(heading))
-        print("Result:" + str(heading.check("[length]")))
-        assert heading.check("[length]")
+        assert length.check("[length]")
 
     def test_UnderStandingOfParams(self):
+        val_metres = Quantity(33, uReg.metre)
+        assert val_metres.check('[length]')
+        self.learnAboutParams("quantity", val_metres)
 
-        tmp_head = Quantity(33, uReg.degree)
-        tmp_head.check('[length]')
-        self.learnAboutParams("quantity", tmp_head)
+        val_yards = Quantity(33, uReg.yard)
+        assert val_yards.check('[length]')
+        self.learnAboutParams("quantity", val_yards)
 
+    @unittest.expectedFailure
+    def test_SendingWrongDimension(self):
         bad_units = Quantity(54, uReg.radian)
-        bad_units.check('[length]')
-        print(repr(bad_units))
+
+        # this should fail, since it's expecting a length
         self.learnAboutParams("quantity", bad_units)
+
 
     @unittest.expectedFailure
     def test_TryToSendNonQuanity_to_QuantityMethod(self):
