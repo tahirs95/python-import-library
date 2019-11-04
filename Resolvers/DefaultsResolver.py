@@ -15,7 +15,7 @@ class DefaultsResolver(DataResolver):
 
         platformType = datastore.searchPlatformType(self.defaultPlatformType)
         if not platformType:
-            platformType = datastore.addPlatformType(self.defaultPlatformType)
+            platformType = datastore.addToPlatformsType(self.defaultPlatformType)
 
         nationality = datastore.searchNationality(self.defaultNationality)
         if not nationality:
@@ -28,7 +28,7 @@ class DefaultsResolver(DataResolver):
 
         sensorType = datastore.searchSensorType(self.defaultSensorType)
         if not sensorType:
-            sensorType = datastore.addSensorType(self.defaultSensorType)
+            sensorType = datastore.addToSensorTypes(self.defaultSensorType)
 
         return sensorName, sensorType
 
@@ -37,7 +37,7 @@ class DefaultsResolver(DataResolver):
 
         privacy = datastore.searchPrivacy(self.defaultPrivacy)
         if not privacy:
-            privacy = datastore.addPrivacy(self.defaultPrivacy)
+            privacy = datastore.addToPrivacies(self.defaultPrivacy)
 
         return tabletypeId, privacy
 

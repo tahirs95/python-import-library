@@ -143,7 +143,7 @@ class DataStore:
     #############################################################
     # Add functions
 
-    def addTableType(self, tabletype_id, tablename):
+    def addToTableTypes(self, tabletype_id, tablename):
         # check in cache for table type
         if tabletype_id in self.tableTypes:
             return self.tableTypes[tabletype_id]
@@ -168,9 +168,9 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return tableTypeObj
 
-    def addEntry(self, tabletypeId, tableName):
+    def addToEntries(self, tabletypeId, tableName):
         # ensure table type exists to satisfy foreign key constraint
-        self.addTableType(tabletypeId, tableName)
+        self.addToTableTypes(tabletypeId, tableName)
 
         # No cache for entries, just add new one when called
         entry_obj = self.DBClasses.Entry(
@@ -184,7 +184,7 @@ class DataStore:
         return entry_obj.entry_id
 
     # TODO: add function to do common pattern of action in these functions
-    def addPlatformTypes(self, platformTypeName):
+    def addToPlatformTypes(self, platformTypeName):
         # check in cache for nationality
         if platformTypeName in self.platformTypes:
             return self.platformTypes[platformTypeName]
@@ -206,7 +206,7 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return platformTypeObj
 
-    def addNationalities(self, nationalityName):
+    def addToNationalities(self, nationalityName):
         # check in cache for nationality
         if nationalityName in self.nationalities:
             return self.nationalities[nationalityName]
@@ -228,7 +228,7 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return nationalityObj
 
-    def addPrivacy(self, privacyName):
+    def addToPrivacies(self, privacyName):
         # check in cache for privacy
         if privacyName in self.privacies:
             return self.privacies[privacyName]
@@ -250,7 +250,7 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return privacyObj
 
-    def addDatafileType(self, datafile_type):
+    def addToDatafileTypes(self, datafile_type):
         # check in cache for datafile type
         if datafile_type in self.datafileTypes:
             return self.datafileTypes[datafile_type]
@@ -275,7 +275,7 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return datafile_type_obj
 
-    def addDatafile(self, datafileName, datafileType):
+    def addToDatafiles(self, datafileName, datafileType):
         # check in cache for datafile
         if datafileName in self.datafiles:
             return self.datafiles[datafileName]
@@ -287,7 +287,7 @@ class DataStore:
             self.datafiles[datafileName] = datafilelookup
             return datafilelookup
 
-        datafile_type_obj = self.addDatafileType(datafileType)
+        datafile_type_obj = self.addToDatafileTypes(datafileType)
 
         # don't know privacy, use resolver to query for data
         missingPrivacyData = self.missing_data_resolver.resolvePrivacy(self, self.DBClasses.Datafile.tabletypeId, self.DBClasses.Datafile.__tablename__)
@@ -295,7 +295,7 @@ class DataStore:
         # missingPrivacyData should contain (tabletype, privacyName)
         # enough info to proceed and create entry
         chosenTableType, chosenPrivacy = missingPrivacyData
-        entry_id = self.addEntry(self.DBClasses.Datafile.tabletypeId, self.DBClasses.Datafile.__tablename__)
+        entry_id = self.addToEntries(self.DBClasses.Datafile.tabletypeId, self.DBClasses.Datafile.__tablename__)
 
         datafile_obj = self.DBClasses.Datafile(
             datafile_id=entry_id,
@@ -313,7 +313,7 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return datafile_obj
 
-    def addPlatform(self, platformName):
+    def addToPlatforms(self, platformName):
         # check in cache for platform
         if platformName in self.platforms:
             return self.platforms[platformName]
@@ -331,7 +331,7 @@ class DataStore:
         # missingPlatformData should contain (platformName, chosenClass, chosenNationality)
         # enough info to proceed and create entry
         chosenPlatformName, chosenClass, chosenNationality = missingPlatformData
-        entry_id = self.addEntry(self.DBClasses.Platform.tabletypeId, self.DBClasses.Platform.__tablename__)
+        entry_id = self.addToEntries(self.DBClasses.Platform.tabletypeId, self.DBClasses.Platform.__tablename__)
 
         platform_obj = self.DBClasses.Platform(
             platform_id=entry_id,
@@ -349,7 +349,7 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return platform_obj
 
-    def addSensorType(self, sensorTypeName):
+    def addToSensorTypes(self, sensorTypeName):
         # check in cache for sensor type
         if sensorTypeName in self.sensorTypes:
             return self.sensorTypes[sensorTypeName]
@@ -371,7 +371,7 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return sensorTypeObj
 
-    def addSensor(self, sensorName, platform):
+    def addToSensors(self, sensorName, platform):
         # check in cache for sensor
         if sensorName in self.sensors:
             return self.sensors[sensorName]
@@ -389,7 +389,7 @@ class DataStore:
         # missingSensorData should contain (sensorName, sensorType)
         # enough info to proceed and create entry
         chosenSensorName, chosenSensorType = missingSensorData
-        entry_id = self.addEntry(self.DBClasses.Sensor.tabletypeId, self.DBClasses.Sensor.__tablename__)
+        entry_id = self.addToEntries(self.DBClasses.Sensor.tabletypeId, self.DBClasses.Sensor.__tablename__)
 
         sensor_obj = self.DBClasses.Sensor(
             sensor_id=entry_id,
@@ -406,7 +406,7 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return sensor_obj
 
-    def addState(self, timestamp, datafile, sensor, lat, long, heading, speed):
+    def addToStates(self, timestamp, datafile, sensor, lat, long, heading, speed):
         # No cache for entries, just add new one when called
 
         # don't know privacy, use resolver to query for data
@@ -415,7 +415,7 @@ class DataStore:
         # missingPrivacyData should contain (tabletype, privacyName)
         # enough info to proceed and create entry
         chosenTableType, chosenPrivacy = missingPrivacyData
-        entry_id = self.addEntry(self.DBClasses.State.tabletypeId, self.DBClasses.State.__tablename__)
+        entry_id = self.addToEntries(self.DBClasses.State.tabletypeId, self.DBClasses.State.__tablename__)
 
         state_obj = self.DBClasses.State(
             state_id=entry_id,
@@ -591,7 +591,7 @@ class DataStore:
         reference_files = [file for file in files if file[:-4] in REFERENCE_TABLES]
         for file in reference_files:
             table_name = file[:-4]
-            possible_method = 'add' + table_name
+            possible_method = 'addTo' + table_name
             method_to_call = getattr(self, possible_method, None)
             if method_to_call:
                 with open(os.path.join(reference_data_folder, file), 'r') as f:

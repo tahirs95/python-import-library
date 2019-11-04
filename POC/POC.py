@@ -8,4 +8,4 @@ filePath = pathlib.Path(__file__).parent.parent / "Resources/Ambig_tracks2_short
 repFile = REPParser.load(str(filePath))
 for repLine in repFile:
     print("line: " + str(repLine))
-    session.addState(repLine)
+    session.addToStates(repLine)
