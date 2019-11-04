@@ -18,8 +18,8 @@ class State:
         self.depth = None
         self.textLabel = None
 
-        # Pint unit registry
-        self.unitreg = None
+        # Initialize pint's unit registry object
+        self.unitreg = UnitRegistry()
 
     def print(self):
         print("REP Line {} - Timestamp: {} Vessel: {} Symbology: {} Latitude: {} Longitude: {} Heading: {} Speed: {} Depth: {} TextLabel: {}"
@@ -29,6 +29,12 @@ class State:
     def parse(self):
 
         tokens = self.line.split()
+
+        if len(tokens) < 15:
+            print("Error on line {} not enough tokens: {}".format(self.lineNum, self.line))
+            return False
+
+
         # separate token strings
         dateToken = tokens[0]
         timeToken = tokens[1]
@@ -47,17 +53,12 @@ class State:
         depthToken = tokens[14]
         textLabelToken = ""
 
-        # Initialize pint's unit registry object
-        self.unitreg = UnitRegistry()
+
 
 
         if len(tokens) >= 16:
             # TODO: join back into single string, or extract full substring
             self.textLabelToken = tokens[15:]
-
-        if len(tokens) < 15:
-            print("Error on line {} not enough tokens: {}".format(self.lineNum, self.line))
-            return False
 
 
         if len(dateToken) != 6 and len(dateToken) != 8:
@@ -170,12 +171,10 @@ class State:
         return self.longitude
 
     def getHeading(self):
-        heading_in_radians = self.heading.to(self.unitreg.radian)
-        return heading_in_radians.magnitude
+        return self.heading
 
     def getSpeed(self):
-        speed_in_mps = self.speed.to(self.unitreg.metre / self.unitreg.second)
-        return speed_in_mps.magnitude
+        return self.speed
 
     def getDepth(self):
         return self.depth

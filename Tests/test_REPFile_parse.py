@@ -1,6 +1,7 @@
 import os, sys
 import unittest
 import datetime
+from pint import UnitRegistry
 
 from Formats.REPFile import REPFile
 from Formats.State import State
@@ -93,13 +94,15 @@ class BasicTests(unittest.TestCase):
 
         print(repline.getTimestamp())
 
+        uReg = UnitRegistry()
+
         self.assertEqual(datetime.datetime(2010, 1, 12, 12, 8), repline.getTimestamp())
         self.assertEqual("SUBJECT", repline.getPlatform())
         self.assertEqual("VC", repline.getSymbology())
      #FixMe   self.assertEqual(Location(60.0, 23.0, 40.25, "N"), repline.getLatitude())
      #FixMe   self.assertEqual("SUBJECT", repline.getLongitude())
-        self.assertEqual(109.08, repline.getHeading())
-        self.assertEqual(6.0, repline.getSpeed())
+        self.assertAlmostEqual(1.9038051480754146, repline.getHeading())
+        self.assertAlmostEqual(6.00, repline.getSpeed().to(uReg.knot).magnitude)
         self.assertEqual(0.0, repline.getDepth())
         self.assertEqual(None, repline.getTextLabel())
 
