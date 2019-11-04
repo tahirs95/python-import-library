@@ -608,32 +608,3 @@ class DataStore:
                                 method_to_call(*row)
             else:
                 print(f"Method({possible_method}) not found!")
-
-    # TODO: Not working yet
-    def populateData(self, sample_data_folder=None):
-        """Import given CSV file to the given metadata/measurement table"""
-        if sample_data_folder is None:
-            sample_data_folder = os.path.join("..", "default_data")
-
-        files = os.listdir(sample_data_folder)
-        metadata_measurement_files =[file for file in files if file[:-4] in MEASUREMENT_TABLES+METADATA_TABLES]
-        for file in metadata_measurement_files:
-            table_name = file[:-4]
-            possible_method = "add" + table_name
-            method_to_call = getattr(self, possible_method, None)
-            if method_to_call:
-                with open(os.path.join(sample_data_folder, file), 'r') as f:
-                    reader = csv.reader(f)
-                    # skip header
-                    _ = next(reader)
-                    with self.session_scope() as session:
-                        for row in reader:
-                            # this solves error of add functions which take one
-                            # value instead of list of strings
-                            if len(row) == 1:
-                                method_to_call(row[0])
-                            else:
-                                print(*row, len(row))
-                                method_to_call(*row)
-            else:
-                print(f"Method({possible_method}) not found!")
