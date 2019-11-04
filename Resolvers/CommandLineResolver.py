@@ -56,7 +56,7 @@ class CommandLineResolver(DataResolver):
             while not nationalityCheckOk:
                 newNationalityInput = input("Please type name of new nationality: ")
                 nationalityCheckOk = datastore.checkNationality(newNationalityInput)
-            chosenNationality = datastore.addNationality(newNationalityInput)
+            chosenNationality = datastore.addNationalities(newNationalityInput)
         else:
             chosenNationality = nationalityOptions[nationalityChoice-2]
 
@@ -76,7 +76,7 @@ class CommandLineResolver(DataResolver):
             while not classCheckOk:
                 newClassInput = input("Please type name of new class: ")
                 classCheckOk = datastore.checkPlatformType(newClassInput)
-            chosenClass = datastore.addPlatformType(newClassInput)
+            chosenClass = datastore.addPlatformTypes(newClassInput)
         else:
             chosenClass = classOptions[classChoice-2]
 
