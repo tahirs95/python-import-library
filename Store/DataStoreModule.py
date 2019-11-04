@@ -1,4 +1,5 @@
 import csv
+import os
 
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine, event
@@ -183,7 +184,7 @@ class DataStore:
         return entry_obj.entry_id
 
     # TODO: add function to do common pattern of action in these functions
-    def addPlatformType(self, platformTypeName):
+    def addPlatformTypes(self, platformTypeName):
         # check in cache for nationality
         if platformTypeName in self.platformTypes:
             return self.platformTypes[platformTypeName]
@@ -205,7 +206,7 @@ class DataStore:
         # should return DB type or something else decoupled from DB?
         return platformTypeObj
 
-    def addNationality(self, nationalityName):
+    def addNationalities(self, nationalityName):
         # check in cache for nationality
         if nationalityName in self.nationalities:
             return self.nationalities[nationalityName]
@@ -579,26 +580,60 @@ class DataStore:
                 retmap[table.__name__] = self.session.query(table).count()
         return retmap
 
-    # Populate method in order to import CSV files
-    def populateReference(self, table_name, file_name):
+    # Populate methods in order to import CSV files
+
+    def populateReference(self, reference_data_folder=None):
         """Import given CSV file to the given reference table"""
-        if table_name not in REFERENCE_TABLES:
-            raise Exception(f"There isn't any table named {table_name} "
-                            f"in the database!")
+        if reference_data_folder is None:
+            reference_data_folder = os.path.join("..", "default_data")
 
-        # TODO: use add methods to insert each row to table
-        with open(file_name, "r") as f:
-            reader = csv.DictReader(f)
-            with self.session_scope() as session:
-                for row in reader:
-                    session.addNationality(row["name"])
+        files = os.listdir(reference_data_folder)
+        reference_files = [file for file in files if file[:-4] in REFERENCE_TABLES]
+        for file in reference_files:
+            table_name = file[:-4]
+            possible_method = 'add' + table_name
+            method_to_call = getattr(self, possible_method, None)
+            if method_to_call:
+                with open(os.path.join(reference_data_folder, file), 'r') as f:
+                    reader = csv.reader(f)
+                    # skip header
+                    _ = next(reader)
+                    with self.session_scope() as session:
+                        for row in reader:
+                            # this solves error of add functions which take one
+                            # value instead of list of strings
+                            if len(row) == 1:
+                                method_to_call(row[0])
+                            else:
+                                method_to_call(*row)
+            else:
+                print(f"Method({possible_method}) not found!")
 
-    def populateData(self, table_name, file_name):
+    # TODO: Not working yet
+    def populateData(self, sample_data_folder=None):
         """Import given CSV file to the given metadata/measurement table"""
-        if table_name not in METADATA_TABLES+MEASUREMENT_TABLES:
-            raise Exception(f"There isn't any table names {table_name} "
-                            f"in the database!")
+        if sample_data_folder is None:
+            sample_data_folder = os.path.join("..", "default_data")
 
-        with open(file_name, "r") as f:
-            reader = csv.DictReader(f)
-            # TODO: use add methods to insert each row to table
+        files = os.listdir(sample_data_folder)
+        metadata_measurement_files =[file for file in files if file[:-4] in MEASUREMENT_TABLES+METADATA_TABLES]
+        for file in metadata_measurement_files:
+            table_name = file[:-4]
+            possible_method = "add" + table_name
+            method_to_call = getattr(self, possible_method, None)
+            if method_to_call:
+                with open(os.path.join(sample_data_folder, file), 'r') as f:
+                    reader = csv.reader(f)
+                    # skip header
+                    _ = next(reader)
+                    with self.session_scope() as session:
+                        for row in reader:
+                            # this solves error of add functions which take one
+                            # value instead of list of strings
+                            if len(row) == 1:
+                                method_to_call(row[0])
+                            else:
+                                print(*row, len(row))
+                                method_to_call(*row)
+            else:
+                print(f"Method({possible_method}) not found!")
