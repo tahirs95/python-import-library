@@ -9,8 +9,8 @@ filePath = pathlib.Path(__file__).parent.parent / "Resources/Ambig_tracks2.rep"
 rep = REPFile(str(filePath))
 
 with datastore.session_scope() as session:
-    datafile = session.addDatafile(rep.getDatafileName(), rep.getDatafileType())
+    datafile = session.addToDatafiles(rep.getDatafileName(), rep.getDatafileType())
     for repLine in rep.getLines():
-        platform = session.addPlatform(repLine.getPlatform())
-        sensor = session.addSensor("GPS", platform)
-        session.addState(repLine.getTimestamp(), datafile, sensor, repLine.getLatitude(), repLine.getLongitude(), repLine.getHeading(), repLine.getSpeed())
+        platform = session.addToPlatforms(repLine.getPlatform())
+        sensor = session.addToSensors("GPS", platform)
+        session.addToStates(repLine.getTimestamp(), datafile, sensor, repLine.getLatitude(), repLine.getLongitude(), repLine.getHeading(), repLine.getSpeed())
