@@ -128,15 +128,15 @@ class DataStore:
     def session_scope(self):
         """Provide a transactional scope around a series of operations."""
         DBSession = sessionmaker(bind=self.engine)
-        session = DBSession()
+        self.session = DBSession()
         try:
-            yield session
-            session.commit()
+            yield self
+            self.session.commit()
         except:
-            session.rollback()
+            self.session.rollback()
             raise
         finally:
-            session.close()
+            self.session.close()
 
 
     #############################################################
