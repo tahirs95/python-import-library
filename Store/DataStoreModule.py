@@ -588,7 +588,16 @@ class DataStore:
             reference_data_folder = os.path.join("..", "default_data")
 
         files = os.listdir(reference_data_folder)
-        reference_files = [file for file in files if file[:-4] in REFERENCE_TABLES]
+
+        reference_tables = []
+        # Create reference table list
+        with self.session_scope() as session:
+            self.setupTabletypeMap()
+            reference_table_objects = self.metaClasses[TableTypes.REFERENCE]
+            for object in list(reference_table_objects):
+                reference_tables.append(object.__tablename__)
+
+        reference_files = [file for file in files if os.path.splitext(file)[0] in reference_tables]
         for file in reference_files:
             # split file into filename and extension
             table_name, _ = os.path.splitext(file)
