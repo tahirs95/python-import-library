@@ -5,7 +5,7 @@ from unittest import TestCase
 from Store.DataStoreModule import DataStore
 
 FILE_PATH = os.path.dirname(__file__)
-TEST_DATA_PATH = os.path.join(FILE_PATH, "data")
+TEST_DATA_PATH = os.path.join(FILE_PATH, "sample_data")
 
 
 class TestDataStorePopulate(TestCase):
