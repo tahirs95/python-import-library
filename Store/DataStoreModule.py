@@ -159,9 +159,8 @@ class DataStore:
             tabletype_id=tabletype_id,
             name=tablename
         )
-        with self.session_scope() as session:
-            session.add(tableTypeObj)
-            session.flush()
+        self.session.add(tableTypeObj)
+        self.session.flush()
 
         # add to cache and return created table type
         self.tableTypes[tabletype_id] = tableTypeObj
@@ -177,9 +176,9 @@ class DataStore:
             tabletype_id=tabletypeId,
             created_user=self.defaultUserId
         )
-        with self.session_scope() as session:
-            session.add(entry_obj)
-            session.flush()
+
+        self.session.add(entry_obj)
+        self.session.flush()
 
         return entry_obj.entry_id
 
@@ -198,9 +197,8 @@ class DataStore:
 
         # enough info to proceed and create entry
         platformTypeObj = self.DBClasses.PlatformType(name=platformTypeName)
-        with self.session_scope() as session:
-            session.add(platformTypeObj)
-            session.flush()
+        self.session.add(platformTypeObj)
+        self.session.flush()
 
         # add to cache and return created platform type
         self.platformTypes[platformTypeName] = platformTypeObj
@@ -221,9 +219,8 @@ class DataStore:
 
         # enough info to proceed and create entry
         nationalityObj = self.DBClasses.Nationality(name=nationalityName)
-        with self.session_scope() as session:
-            session.add(nationalityObj)
-            session.flush()
+        self.session.add(nationalityObj)
+        self.session.flush()
 
         # add to cache and return created platform
         self.nationalities[nationalityName] = nationalityObj
@@ -244,9 +241,8 @@ class DataStore:
 
         # enough info to proceed and create entry
         privacyObj = self.DBClasses.Privacy(name=privacyName)
-        with self.session_scope() as session:
-            session.add(privacyObj)
-            session.flush()
+        self.session.add(privacyObj)
+        self.session.flush()
 
         # add to cache and return created platform
         self.privacies[privacyName] = privacyObj
@@ -269,9 +265,9 @@ class DataStore:
         datafile_type_obj = self.DBClasses.DatafileType(
             name=datafile_type
         )
-        with self.session_scope() as session:
-            session.add(datafile_type_obj)
-            session.flush()
+
+        self.session.add(datafile_type_obj)
+        self.session.flush()
 
         # add to cache and return created datafile type
         self.datafileTypes[datafile_type] = datafile_type_obj
@@ -308,9 +304,9 @@ class DataStore:
             privacy_id=chosenPrivacy.privacy_id,
             datafiletype_id=datafile_type_obj.datafiletype_id
         )
-        with self.session_scope() as session:
-            session.add(datafile_obj)
-            session.flush()
+
+        self.session.add(datafile_obj)
+        self.session.flush()
 
         self.datafiles[datafileName] = datafile_obj
         # should return DB type or something else decoupled from DB?
@@ -343,9 +339,9 @@ class DataStore:
             host_platform_id=None,
             nationality_id=chosenNationality.nationality_id
         )
-        with self.session_scope() as session:
-            session.add(platform_obj)
-            session.flush()
+
+        self.session.add(platform_obj)
+        self.session.flush()
 
         # add to cache and return created platform
         self.platforms[platformName] = platform_obj
@@ -366,9 +362,8 @@ class DataStore:
 
         # enough info to proceed and create entry
         sensorTypeObj = self.DBClasses.SensorType(name=sensorTypeName)
-        with self.session_scope() as session:
-            session.add(sensorTypeObj)
-            session.flush()
+        self.session.add(sensorTypeObj)
+        self.session.flush()
 
         # add to cache and return created sensor type
         self.sensorTypes[sensorTypeName] = sensorTypeObj
@@ -401,9 +396,9 @@ class DataStore:
             sensortype_id=self.DBClasses.mapUUIDType(chosenSensorType.sensortype_id),
             platform_id=self.DBClasses.mapUUIDType(platform.platform_id)
         )
-        with self.session_scope() as session:
-            session.add(sensor_obj)
-            session.flush()
+
+        self.session.add(sensor_obj)
+        self.session.flush()
 
         # add to cache and return created sensor
         self.sensors[sensorName] = sensor_obj
@@ -433,9 +428,8 @@ class DataStore:
             datafile_id=datafile.datafile_id,
             privacy_id=chosenPrivacy.privacy_id
         )
-        with self.session_scope() as session:
-            session.add(state_obj)
-            session.flush()
+        self.session.add(state_obj)
+        self.session.flush()
 
         return state_obj
 
@@ -445,48 +439,39 @@ class DataStore:
 
     def searchDatafileType(self, datafileTypeSearchName):
         # search for any datafile type with this name
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.DatafileType).filter(self.DBClasses.DatafileType.name == datafileTypeSearchName).first()
+        return self.session.query(self.DBClasses.DatafileType).filter(self.DBClasses.DatafileType.name == datafileTypeSearchName).first()
 
     def searchDatafile(self, datafileSearchName):
         # search for any datafile with this name
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.Datafile).filter(self.DBClasses.Datafile.reference == datafileSearchName).first()
+        return self.session.query(self.DBClasses.Datafile).filter(self.DBClasses.Datafile.reference == datafileSearchName).first()
 
     def searchPlatform(self, platformSearchName):
         # search for any platform with this name
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.Platform).filter(self.DBClasses.Platform.name == platformSearchName).first()
+        return self.session.query(self.DBClasses.Platform).filter(self.DBClasses.Platform.name == platformSearchName).first()
 
     def searchPlatformType(self, platformTypeSearchName):
         # search for any platform type with this name
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.PlatformType).filter(self.DBClasses.PlatformType.name == platformTypeSearchName).first()
+        return self.session.query(self.DBClasses.PlatformType).filter(self.DBClasses.PlatformType.name == platformTypeSearchName).first()
 
     def searchNationality(self, nationalitySearchName):
         # search for any nationality with this name
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.Nationality).filter(self.DBClasses.Nationality.name == nationalitySearchName).first()
+        return self.session.query(self.DBClasses.Nationality).filter(self.DBClasses.Nationality.name == nationalitySearchName).first()
 
     def searchSensor(self, sensorSearchName):
         # search for any sensor type featuring this name
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.Sensor).filter(self.DBClasses.Sensor.name == sensorSearchName).first()
+        return self.session.query(self.DBClasses.Sensor).filter(self.DBClasses.Sensor.name == sensorSearchName).first()
 
     def searchSensorType(self, sensorTypeSearchName):
         # search for any sensor type featuring this name
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.SensorType).filter(self.DBClasses.SensorType.name == sensorTypeSearchName).first()
+        return self.session.query(self.DBClasses.SensorType).filter(self.DBClasses.SensorType.name == sensorTypeSearchName).first()
 
     def searchPrivacy(self, privacySearchName):
         # search for any privacy with this name
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.Privacy).filter(self.DBClasses.Privacy.name == privacySearchName).first()
+        return self.session.query(self.DBClasses.Privacy).filter(self.DBClasses.Privacy.name == privacySearchName).first()
 
     def searchTableType(self, tabletype_id):
         # search for any table type with this id
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.TableType).filter(self.DBClasses.TableType.tabletype_id == tabletype_id).first()
+        return self.session.query(self.DBClasses.TableType).filter(self.DBClasses.TableType.tabletype_id == tabletype_id).first()
 
 
     #############################################################
@@ -494,33 +479,27 @@ class DataStore:
 
     def getNationalities(self):
         # get list of all nationalities in the DB
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.Nationality).all()
+        return self.session.query(self.DBClasses.Nationality).all()
 
     def getPlatformTypes(self):
         # get list of all platform types in the DB
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.PlatformType).all()
+        return self.session.query(self.DBClasses.PlatformType).all()
 
     def getPrivacies(self):
         # get list of all privacies in the DB
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.Privacy).all()
+        return self.session.query(self.DBClasses.Privacy).all()
 
     def getSensors(self):
         # get list of all sensors in the DB
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.Sensor).all()
+        return self.session.query(self.DBClasses.Sensor).all()
 
     def getSensorTypes(self):
         # get list of all sensors types in the DB
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.SensorType).all()
+        return self.session.query(self.DBClasses.SensorType).all()
 
     def getSensorsByPlatformType(self, platformType):
         # given platform type, return all Sensors contained on platforms of that type
-        with self.session_scope() as session:
-            return session.query(self.DBClasses.Platform, self.DBClasses.Sensor).join(self.DBClasses.Sensor, self.DBClasses.Sensor.platform_id == self.DBClasses.Platform.platform_id).filter(self.DBClasses.Platform.platformtype_id == platformType.platformtype_id).all()
+        return self.session.query(self.DBClasses.Platform, self.DBClasses.Sensor).join(self.DBClasses.Sensor, self.DBClasses.Sensor.platform_id == self.DBClasses.Platform.platform_id).filter(self.DBClasses.Platform.platformtype_id == platformType.platformtype_id).all()
 
 
     #############################################################
@@ -597,8 +576,7 @@ class DataStore:
         retmap = {}
         for tabletype in tabletypes:
             for table in self.metaClasses[tabletype]:
-                with self.session_scope() as session:
-                    retmap[table.__name__] = session.query(table).count()
+                retmap[table.__name__] = self.session.query(table).count()
         return retmap
 
     # Populate method in order to import CSV files
