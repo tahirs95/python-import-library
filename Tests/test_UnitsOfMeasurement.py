@@ -9,7 +9,11 @@ from Formats.REPFile import REPFile
 from Formats.State import State
 from Formats.Location import Location
 
-class BasicTests(unittest.TestCase):
+# declare single instance of ureg for this class
+uReg = UnitRegistry()
+Quantity = uReg.Quantity
+
+class UnitsTests(unittest.TestCase):
 
     ############################
     #### setup and teardown ####
@@ -26,10 +30,23 @@ class BasicTests(unittest.TestCase):
     ####################
 
 
-    def test_roundTripDegs(self):
+    def learnAboutParams(self, msg, heading: Quantity):
+        # check the parameter is of the correct type
+        heading.check("[length]")
 
-        uReg = UnitRegistry()
-        Quantity = uReg.Quantity
+    def test_UnderStandingOfParams(self):
+        #uReg = UnitRegistry()
+        # Quantity = uReg.Quantity
+
+        tmp_head = Quantity(33, uReg.degree)
+        tmp_head.check('[length]')
+        self.learnAboutParams("quantity", Quantity(30, uReg.meter))
+
+    @unittest.expectedFailure
+    def test_TryToSendNonQuanity_to_QuantityMethod(self):
+        self.learnAboutParams("float", 46.0)
+
+    def test_roundTripDegs(self):
 
         headingDegs = Quantity(180.0, uReg.degrees)
 
@@ -43,8 +60,6 @@ class BasicTests(unittest.TestCase):
         self.assertEqual("<Quantity(180.0, 'degree')>", repr(backToDegs))
 
     def test_roundTripSpeed(self):
-        uReg = UnitRegistry()
-        Quantity = uReg.Quantity
 
         speedKts = Quantity(20, uReg.knot)
 
@@ -67,9 +82,6 @@ class BasicTests(unittest.TestCase):
         # heading -> 109.08 (degrees)
         # speed   -> 6.00 (knots)
 
-        # use `almost-equal`
-        print("speed in test:", repr(state.getSpeed()))
-        print("heading in text", repr(state.getHeading()))
         self.assertEqual("<Quantity(109.08, 'degree')>", repr(state.getHeading()))
         self.assertEqual("<Quantity(6.0, 'knot')>", repr(state.getSpeed()))
         
