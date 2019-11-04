@@ -18,48 +18,6 @@ from Resolvers.DefaultsResolver import DefaultsResolver
 
 # TODO: probably move this module to the top level as it's the main one
 
-# Tables names
-REFERENCE_TABLES = [
-    "PlatformTypes",
-    "Nationalities",
-    "GeometryTypes",
-    "GeometrySubTypes",
-    "Users",
-    "unitTypes",
-    "ClassificationTypes",
-    "ContactTypes",
-    "SensorTypes",
-    "Privacies",
-    "DatafileTypes",
-    "MediaTypes",
-    "CommentTypes",
-    "CommodityTypes",
-    "ConfidenceLevels",
-]
-METADATA_TABLES = [
-    "HostedBy",
-    "Platforms",
-    "Participation",
-    "Tasks",
-    "Tags",
-    "Tagged Item",
-    "Log",
-    "Extractions",
-    "Changes",
-    "Sensors",
-    "Datafiles",
-    "Synonyms",
-]
-MEASUREMENT_TABLES = [
-    "State",
-    "Contacts",
-    "Activations",
-    "LogsHoldings",
-    "Comments",
-    "Geometries",
-    "Media",
-]
-
 
 class DataStore:
 
