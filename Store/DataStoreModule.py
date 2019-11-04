@@ -590,6 +590,7 @@ class DataStore:
         files = os.listdir(reference_data_folder)
         reference_files = [file for file in files if file[:-4] in REFERENCE_TABLES]
         for file in reference_files:
+            # TODO: A method necessary to remove suffix instead of slicing
             table_name = file[:-4]
             possible_method = 'addTo' + table_name
             method_to_call = getattr(self, possible_method, None)
