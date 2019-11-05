@@ -67,7 +67,7 @@ class DB:
         self.session.add(countryObj)
         self.session.commit()
 
-    def addState(self, repLine):
+    def addToStates(self, repLine):
         stateObj = State(
             time=repLine.timestamp,
             sensor_id='c1cd04fd-8b29-4ded-b146-fed4fd65167c',

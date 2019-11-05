@@ -39,7 +39,7 @@ class CommandLineResolver(DataResolver):
                 print("Quitting")
                 sys.exit(1)
 
-    def addPlatform(self, datastore, platformName):
+    def addToPlatforms(self, datastore, platformName):
         ###### Chose Nationality ######
         print("Ok, adding new platform.")
         nationalityOptions = datastore.getNationalities()
@@ -56,7 +56,7 @@ class CommandLineResolver(DataResolver):
             while not nationalityCheckOk:
                 newNationalityInput = input("Please type name of new nationality: ")
                 nationalityCheckOk = datastore.checkNationality(newNationalityInput)
-            chosenNationality = datastore.addNationality(newNationalityInput)
+            chosenNationality = datastore.addToNationalities(newNationalityInput)
         else:
             chosenNationality = nationalityOptions[nationalityChoice-2]
 
@@ -76,7 +76,7 @@ class CommandLineResolver(DataResolver):
             while not classCheckOk:
                 newClassInput = input("Please type name of new class: ")
                 classCheckOk = datastore.checkPlatformType(newClassInput)
-            chosenClass = datastore.addPlatformType(newClassInput)
+            chosenClass = datastore.addToPlatformTypes(newClassInput)
         else:
             chosenClass = classOptions[classChoice-2]
 
@@ -107,7 +107,7 @@ class CommandLineResolver(DataResolver):
             #     while not sensorCheckOk:
             #         newSensorInput = input("Please type name of new sensor: ")
             #         sensorCheckOk = datastore.checkSensor(newSensorInput)
-            #     #chosenSensor = datastore.addSensor(newClassInput)
+            #     #chosenSensor = datastore.addToSensors(newClassInput)
             #     chosenSensor = newSensorInput
             #     newSensor = True
 
@@ -127,7 +127,7 @@ class CommandLineResolver(DataResolver):
             while not classificationCheckOk:
                 newClassificationInput = input("Please type name of new classification: ")
                 classificationCheckOk = datastore.checkPrivacy(newClassificationInput)
-            chosenClassification = datastore.addPrivacy(newClassificationInput)
+            chosenClassification = datastore.addToPrivacies(newClassificationInput)
         else:
             chosenClassification = classificationOptions[classificationChoice-2]
 
@@ -150,7 +150,7 @@ class CommandLineResolver(DataResolver):
             # TODO: pass back sensor and classification when Schema changed
             return platformName, chosenClass, chosenNationality
         elif createChoice == 2:
-            return self.addPlatform(datastore, platformName)
+            return self.addToPlatforms(datastore, platformName)
         elif createChoice == 3:
             print("Quitting")
             sys.exit(1)
@@ -164,12 +164,12 @@ class CommandLineResolver(DataResolver):
         if actionChoice == 1:
             #synSearch = self.synonymSearch(datastore, platformName)
             #print(f"Adding {synSearch} as a synonym for {platformName}")
-            return self.addPlatform(datastore, platformName)
+            return self.addToPlatforms(datastore, platformName)
         else:
             print("Quitting")
             sys.exit(1)
 
-    def addSensor(self, datastore, sensorName):
+    def addToSensors(self, datastore, sensorName):
         ###### Chose Sensor Type ######
         print("Ok, adding new sensor.")
         sensorTypeOptions = datastore.getSensorTypes()
@@ -186,7 +186,7 @@ class CommandLineResolver(DataResolver):
             while not sensorTypeCheckOk:
                 sensorTypeInput = input("Please type name of new sensor type: ")
                 sensorTypeCheckOk = datastore.checkSensorType(sensorTypeInput)
-            chosenSensorType = datastore.addSensorType(sensorTypeInput)
+            chosenSensorType = datastore.addToSensorTypes(sensorTypeInput)
         else:
             chosenSensorType = sensorTypeOptions[sensorTypeChoice-2]
 
@@ -198,7 +198,7 @@ class CommandLineResolver(DataResolver):
                                                         "Cancel import"])
 
         if actionChoice == 1:
-            return self.addSensor(datastore, sensorName)
+            return self.addToSensors(datastore, sensorName)
         elif actionChoice == 2:
             print("Quitting")
             sys.exit(1)
@@ -223,7 +223,7 @@ class CommandLineResolver(DataResolver):
             while not classificationCheckOk:
                 newClassificationInput = input("Please type name of new classification: ")
                 classificationCheckOk = datastore.checkPrivacy(newClassificationInput)
-            chosenClassification = datastore.addPrivacy(newClassificationInput)
+            chosenClassification = datastore.addToPrivacies(newClassificationInput)
         else:
             chosenClassification = classificationOptions[classificationChoice-2]
 
