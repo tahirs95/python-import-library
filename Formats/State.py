@@ -1,6 +1,6 @@
 from datetime import datetime
 from .Location import Location
-from pint import UnitRegistry
+from . import ureg, Quantity
 
 class State:
 
@@ -19,7 +19,7 @@ class State:
         self.textLabel = None
 
         # Initialize pint's unit registry object
-        self.unitreg = UnitRegistry()
+        self.unitreg = ureg
 
     def print(self):
         print("REP Line {} - Timestamp: {} Vessel: {} Symbology: {} Latitude: {} Longitude: {} Heading: {} Speed: {} Depth: {} TextLabel: {}"
@@ -143,7 +143,7 @@ class State:
     def setSpeed(self, speed):
         self.speed = speed
 
-    def setHeading(self, heading):   
+    def setHeading(self, heading : Quantity):
         self.heading = heading
 
     def setLatitude(self):

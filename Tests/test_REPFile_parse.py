@@ -6,6 +6,7 @@ from pint import UnitRegistry
 from Formats.REPFile import REPFile
 from Formats.State import State
 from Formats.Location import Location
+from Formats import ureg
 
 class BasicTests(unittest.TestCase):
 
@@ -94,7 +95,7 @@ class BasicTests(unittest.TestCase):
 
         print(repline.getTimestamp())
 
-        uReg = UnitRegistry()
+        uReg = ureg
 
         self.assertEqual(datetime.datetime(2010, 1, 12, 12, 8), repline.getTimestamp())
         self.assertEqual("SUBJECT", repline.getPlatform())

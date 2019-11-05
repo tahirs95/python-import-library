@@ -8,10 +8,10 @@ from pint import UnitRegistry
 from Formats.REPFile import REPFile
 from Formats.State import State
 from Formats.Location import Location
+from Formats import ureg, Quantity
 
 # declare single instance of ureg for this class
-uReg = UnitRegistry()
-Quantity = uReg.Quantity
+uReg = ureg
 
 class UnitsTests(unittest.TestCase):
 
