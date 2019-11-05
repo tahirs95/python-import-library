@@ -9,6 +9,9 @@ Link to working demo of datafile import: [![Binder](https://mybinder.org/badge_l
 Placeholder for live Jupyter view of whole repo
 [![Master branch](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/debrief/python-import-library/master)
 
+# Work in progress
+View the project Kanban board [here](https://github.com/debrief/python-import-library/projects/1)
+
 # Setup
 
 To prepare for running ensure these tools and packages are installed:
